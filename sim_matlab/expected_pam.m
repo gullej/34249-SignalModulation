@@ -1,6 +1,4 @@
-clear variables
-close all
-clc
+clear variables;close all;clc
 %%
 T = 1;
 m = 4;
@@ -37,12 +35,9 @@ ylim([10^(-10) 10^(0)])
 xlim([1 24])
 grid on
 legend('PAM2','PAM4','PAM8')
-ylabel('P_e','FontSize',11,...
-       'FontWeight','bold')
-xlabel('10*log(E_{av}/N_0) [SNR]','FontSize',11,...
-       'FontWeight','bold')
-title('Symbol Error Probability','FontSize',14,...
-       'FontWeight','bold')
+ylabel('P_e','FontSize',11,'FontWeight','bold')
+xlabel('10*log(E_{av}/N_0) [SNR]','FontSize',11,'FontWeight','bold')
+title('Symbol Error Probability','FontSize',14,'FontWeight','bold')
 
 set(h,'Units','Inches');
 pos = get(h,'Position');
