@@ -9,10 +9,9 @@ E = sum(pulse.^2)*T_s;
 
 SNR = [0:1:24]; %EbN0+10*log10(1/n); % dB
 N0 = sqrt(10.^(-SNR/10)/2); % sqrt(No/2) with Eb=1
+n = size(N0,2);
 
 M = [2,4,8];
-
-n = size(N0,2);
 m = size(M,2);
 
 P_e = zeros(m,n);
@@ -22,7 +21,6 @@ for i = 1:m
         P_e(i,j) = (2*M(i)-2)/M(i) * qfunc(sqrt(6*E_av)/((M(i)^2-1)*N0(j)));
     end
 end
-
 
 h = figure;
 
