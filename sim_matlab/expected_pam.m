@@ -1,4 +1,4 @@
-clear variables;close all;clc
+clear variables; close all; clc
 %%
 T = 1;
 m = 4;
