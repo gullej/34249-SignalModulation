@@ -19,6 +19,9 @@ transcript*
 sc_dpiheader.h
 vsim.dbg
 
+# matlab
+*.asv
+
 # ignore quartus folders
 db/
 incremental_db

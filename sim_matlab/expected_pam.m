@@ -32,7 +32,8 @@ semilogy(P_e(3,:)')
 ylim([10^(-10) 10^(0)])
 xlim([1 24])
 grid on
-legend('PAM2','PAM4','PAM8')
+
+legend('PAM2','PAM4','PAM8', 'Location','southwest')
 ylabel('P_e','FontSize',11,'FontWeight','bold')
 xlabel('10*log(E_{av}/N_0) [SNR]','FontSize',11,'FontWeight','bold')
 title('Symbol Error Probability','FontSize',14,'FontWeight','bold')

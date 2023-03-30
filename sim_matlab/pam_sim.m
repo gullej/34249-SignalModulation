@@ -73,9 +73,22 @@ BER_pam2 = BER_pam2/sims;
 BER_pam4 = BER_pam4/sims;
 BER_pam8 = BER_pam8/sims;
 
-figure
+%%
+
+h = figure;
+
 semilogy(SNR, BER_pam2, '-bx', SNR, BER_pam4, '-gsq', SNR, BER_pam8, '-ro')
-legend('PAM2', 'PAM4', 'PAM8')
+
 grid on
-xlabel('SNR, dB');
+ylim([10^(-8.5) 10^(0)])
+xlim([1 24])
+
+legend('PAM2', 'PAM4', 'PAM8', 'Location','southwest')
 ylabel('BER')
+xlabel('10*log(E_{av}/N_0) [SNR]','FontSize',11,'FontWeight','bold')
+title('Symbol Error Probability','FontSize',14,'FontWeight','bold')
+
+set(h,'Units','Inches');
+pos = get(h,'Position');
+set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(h,'docs/MeasuredBitError','-dpdf','-r0')
