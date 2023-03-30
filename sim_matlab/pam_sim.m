@@ -8,26 +8,24 @@ cut = (size(pulse,2)-1)/2;
 
 % Noise
 SNR = [0:1:24]; %EbN0+10*log10(1/n); % dB
-
-N0 = sqrt(10.^(-SNR/10)/2); % sqrt(No/2) with Eb=1
 k = size(SNR,2);
 
-% TO-DO
-% we need a different noise level for each
-%pamSyms2 = [-1 1];
-%pow2 = mean(abs(pamSyms2).^2)*E./SNR;
-%N0{1} = sqrt(10.^(-pow2/10)); % sqrt(No/2) with Eb=1
-%
-%pamSyms4 = [-3 -1 1 3];
-%pow4 = mean(abs(pamSyms4).^2)*E./SNR;
-%N0{2} = sqrt(10.^(-pow4/10)); % sqrt(No/2) with Eb=1
-%
-%pamSyms8 = [-7 -5 -3 -1 1 3 5 7];
-%pow8 = mean(abs(pamSyms8).^2)*E./SNR;
-%N0{3} = sqrt(10.^(-pow8/10)); % sqrt(No/2) with Eb=1 
+% normalize noise based on symbols of the pam
+N0 = cell(1,3);
+pamSyms2 = [-1 1];
+pow2 = (mean(abs(pamSyms2).^2)*E);
+N0{1} = sqrt(10.^(-SNR/10))*pow2; % sqrt(No/2) with Eb=1
 
-%
-sims = 1000;
+pamSyms4 = [-3 -1 1 3];
+pow4 = (mean(abs(pamSyms4).^2)*E);
+N0{2} = sqrt(10.^(-SNR/10))*pow4; % sqrt(No/2) with Eb=1
+
+pamSyms8 = [-7 -5 -3 -1 1 3 5 7];
+pow8 = (mean(abs(pamSyms8).^2))*E;
+N0{3} = sqrt(10.^(-SNR/10))*pow8; % sqrt(No/2) with Eb=1 
+
+% variables for sim
+sims = 10000; % reduce to 10 for debugging
 n = 12000;
 BER_pam2 = zeros(1,k);
 BER_pam4 = zeros(1,k);
@@ -50,7 +48,7 @@ for sig = 1:k
 
             % AWGN
             Nn=length(v);
-            r = v + sqrt(m)*N0(sig)*randn(1,Nn);
+            r = v + sqrt(m)*N0{log2(pam)}(sig)*randn(1,Nn);
             %r = v;
 
             % match filter
@@ -61,8 +59,10 @@ for sig = 1:k
             %demodulate
             Nnn = length(r);
             r = pam_gray_inv(r, Nnn, pam);
-            nErrs = sum(r(4:end-3) ~= signal(4:end-3));
-            errs(log2(pam)) = errs(log2(pam)) + (nErrs/n);
+            % compare, there were issues with the first and last couple 
+            % bits, so they are removed
+            nErrs = sum(r(6:end-5) ~= signal(6:end-5));
+            errs(log2(pam)) = errs(log2(pam)) + (nErrs/(n-12));
         end
         BER_pam2(sig) = BER_pam2(sig) + errs(1);
         BER_pam4(sig) = BER_pam4(sig) + errs(2);
