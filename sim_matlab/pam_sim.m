@@ -13,19 +13,19 @@ k = size(SNR,2);
 % normalize noise based on symbols of the pam
 N0 = cell(1,3);
 pamSyms2 = [-1 1];
-pow2 = (mean(abs(pamSyms2).^2)*E);
+pow2 = mean(abs(pamSyms2).^2)*E;
 N0{1} = sqrt(10.^(-SNR/10))*pow2; % sqrt(No/2) with Eb=1
 
 pamSyms4 = [-3 -1 1 3];
-pow4 = (mean(abs(pamSyms4).^2)*E);
+pow4 = mean(abs(pamSyms4).^2)*E;
 N0{2} = sqrt(10.^(-SNR/10))*pow4; % sqrt(No/2) with Eb=1
 
 pamSyms8 = [-7 -5 -3 -1 1 3 5 7];
-pow8 = (mean(abs(pamSyms8).^2))*E;
+pow8 = mean(abs(pamSyms8).^2)*E;
 N0{3} = sqrt(10.^(-SNR/10))*pow8; % sqrt(No/2) with Eb=1 
 
 % variables for sim
-sims = 10000; % reduce to 10 for debugging
+sims = 100; % reduce to 10 for debugging
 n = 12000;
 BER_pam2 = zeros(1,k);
 BER_pam4 = zeros(1,k);
@@ -70,8 +70,8 @@ for sig = 1:k
     end
 end
 BER_pam2 = BER_pam2/sims;
-BER_pam4 = BER_pam4/sims;
-BER_pam8 = BER_pam8/sims;
+BER_pam4 = BER_pam4/sims/2;
+BER_pam8 = BER_pam8/sims/3;
 
 %%
 
@@ -84,7 +84,7 @@ ylim([10^(-8.5) 10^(0)])
 xlim([1 24])
 
 legend('PAM2', 'PAM4', 'PAM8', 'Location','southwest')
-ylabel('BER')
+ylabel('Symbol Error')
 xlabel('10*log(E_{av}/N_0) [SNR]','FontSize',11,'FontWeight','bold')
 title('Symbol Error Probability','FontSize',14,'FontWeight','bold')
 
