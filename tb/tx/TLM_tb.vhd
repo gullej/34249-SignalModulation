@@ -19,6 +19,19 @@ architecture testbench of transceiver_tb is
   signal clk  :  std_logic;
   signal rst  :  std_logic;
 
-  
+  begin
+    -- create Clock
+    Osvvm.TbUtilPkg.CreateClock (
+      Clk        => Clk,
+      Period     => Tperiod_Clk
+    )  ;
 
+    -- create nReset
+    Osvvm.TbUtilPkg.CreateReset (
+      Reset       => rst,
+      ResetActive => '1',
+      Clk         => Clk,
+      Period      => 7 * tperiod_Clk,
+      tpd         => tpd
+    ) ;
 end testbench;
