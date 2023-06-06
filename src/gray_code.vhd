@@ -1,9 +1,9 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 
-ENTITY pam_map IS
+ENTITY gray_code IS
     GENERIC (
-        CONSTELLATION_SIZE : INTEGER);
+        DATA_WIDTH : INTEGER);
     PORT (
         rst : IN STD_LOGIC;
         clk : IN STD_LOGIC;
@@ -12,15 +12,15 @@ ENTITY pam_map IS
         rx_val : IN STD_LOGIC;
         rx_full : IN STD_LOGIC;
         --
-        tx_dat : OUT STD_LOGIC_VECTOR(CONSTELLATION_SIZE - 1 DOWNTO 0);
+        tx_dat : OUT STD_LOGIC_VECTOR(DATA_WIDTH - 1 DOWNTO 0);
         tx_wr : OUT STD_LOGIC
     );
-END pam_map;
+END gray_code;
 
-ARCHITECTURE pam_map_arc OF pam_map IS
+ARCHITECTURE gray_code_arc OF gray_code IS
 
-    SIGNAL rx_dat_sr : STD_LOGIC_VECTOR(CONSTELLATION_SIZE - 1 DOWNTO 0);
-    SIGNAL cnt : INTEGER RANGE 0 TO CONSTELLATION_SIZE - 1;
+    SIGNAL rx_dat_sr : STD_LOGIC_VECTOR(DATA_WIDTH - 1 DOWNTO 0);
+    SIGNAL cnt : INTEGER RANGE 0 TO DATA_WIDTH - 1;
 
 BEGIN
 
@@ -39,7 +39,7 @@ BEGIN
                     cnt <= cnt + 1;
                 END IF;
 
-                IF (cnt = CONSTELLATION_SIZE) THEN
+                IF (cnt = DATA_WIDTH) THEN
                     tx_wr <= '1';
                 END IF;
             END IF;
@@ -49,4 +49,4 @@ BEGIN
             END IF;
         END IF;
     END PROCESS;
-END pam_map_arc;
+END gray_code_arc;

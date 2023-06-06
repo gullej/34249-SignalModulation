@@ -3,7 +3,7 @@ USE ieee.std_logic_1164.ALL;
 
 ENTITY tranceiver_top IS
     GENERIC (
-        CONSTELLATION_SIZE : INTEGER);
+        DATA_WIDTH : INTEGER);
     PORT (
 
     );
