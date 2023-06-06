@@ -5,22 +5,22 @@ ENTITY gray_code IS
     GENERIC (
         DATA_WIDTH : INTEGER);
     PORT (
-        rst : IN STD_LOGIC;
-        clk : IN STD_LOGIC;
+        rst     :  IN  STD_LOGIC;
+        clk     :  IN  STD_LOGIC;
         --
-        rx_dat : IN STD_LOGIC;
-        rx_val : IN STD_LOGIC;
-        rx_full : IN STD_LOGIC;
+        rx_dat  :  IN  STD_LOGIC;
+        rx_val  :  IN  STD_LOGIC;
+        rx_full :  IN  STD_LOGIC;
         --
-        tx_dat : OUT STD_LOGIC_VECTOR(DATA_WIDTH - 1 DOWNTO 0);
-        tx_wr : OUT STD_LOGIC
+        tx_dat  :  OUT STD_LOGIC_VECTOR(DATA_WIDTH - 1 DOWNTO 0);
+        tx_wr   :  OUT STD_LOGIC
     );
 END gray_code;
 
 ARCHITECTURE gray_code_arc OF gray_code IS
 
-    SIGNAL rx_dat_sr : STD_LOGIC_VECTOR(DATA_WIDTH - 1 DOWNTO 0);
-    SIGNAL cnt : INTEGER RANGE 0 TO DATA_WIDTH - 1;
+    SIGNAL rx_dat_sr :  STD_LOGIC_VECTOR(DATA_WIDTH - 1 DOWNTO 0);
+    SIGNAL cnt       :  INTEGER RANGE 0 TO DATA_WIDTH - 1;
 
 BEGIN
 
@@ -29,8 +29,8 @@ BEGIN
     PROCESS (clk)
     BEGIN
         IF (rising_edge(clk)) THEN
+            cnt   <= cnt;
             tx_wr <= '0';
-            cnt <= cnt;
             rx_dat_sr <= rx_dat_sr;
 
             IF (rx_full = '0') THEN
@@ -48,5 +48,7 @@ BEGIN
                 cnt <= 0;
             END IF;
         END IF;
+
     END PROCESS;
+    
 END gray_code_arc;
