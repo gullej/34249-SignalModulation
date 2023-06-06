@@ -80,12 +80,12 @@ ARCHITECTURE SYN OF clk_sync IS
 		wrsync_delaypipe	    :  NATURAL
 	);
 	PORT (
-			data	 :  IN  STD_LOGIC_VECTOR (7 DOWNTO 0);
+			data	 :  IN  STD_LOGIC_VECTOR (DATA_WIDTH-1 DOWNTO 0);
 			rdclk	 :  IN  STD_LOGIC ;
 			rdreq	 :  IN  STD_LOGIC ;
 			wrclk	 :  IN  STD_LOGIC ;
 			wrreq	 :  IN  STD_LOGIC ;
-			q	     :  OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
+			q	     :  OUT STD_LOGIC_VECTOR (DATA_WIDTH-1 DOWNTO 0);
 			rdempty	 :  OUT STD_LOGIC ;
 			wrfull	 :  OUT STD_LOGIC 
 	); 
@@ -103,7 +103,7 @@ BEGIN
 		lpm_showahead          => "OFF",
 		lpm_type               => "dcfifo",
 		lpm_width              => DATA_WIDTH,
-		lpm_widthu             => 3,
+		lpm_widthu             => 5,
 		overflow_checking      => "ON",
 		rdsync_delaypipe       => 5,
 		underflow_checking     => "ON",
