@@ -113,6 +113,7 @@ architecture testbench of gray_code_tb is
             report("Output Samples");
             WriteBin(Cov2);
 
+            std.env.finish;
             wait ;
     end process;
 

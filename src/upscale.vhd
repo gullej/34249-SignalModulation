@@ -19,15 +19,17 @@ ENTITY upscale IS
 END upscale;
 
 ARCHITECTURE upscale_arc OF upscale IS
-BEGIN
 
-    tx_dat <= rx_dat & (others => '0');
+    CONSTANT zeros : STD_LOGIC_VECTOR(7 * DATA_WIDTH - 1 DOWNTO 0) := (others => '0');
+
+BEGIN
 
     PROCESS (clk)
     BEGIN
         IF (rising_edge(clk)) THEN
             tx_rd  <= '0';
             tx_val <= '0';
+            tx_dat <= rx_dat & zeros;
 
             IF (rx_empty = '0') THEN
                 tx_rd <= '1';
