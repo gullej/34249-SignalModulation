@@ -10,7 +10,7 @@ entity gray_code_tb is
     generic(
         DATA_WIDTH : integer := 2
     );
-entity gray_code_tb;
+end entity gray_code_tb;
 
 architecture testbench of gray_code_tb is
 
@@ -30,6 +30,9 @@ architecture testbench of gray_code_tb is
     shared variable cov_a : covPType;
     shared variable cov_b : covPType;
 
+    signal Cov1 : CoverageIDType ;
+    signal Cov2 : CoverageIDType ;
+    
     begin
 
     -- create Clock
@@ -64,8 +67,9 @@ architecture testbench of gray_code_tb is
         );
 
     RANDOM_GEN : process
-        variable RV : RandomPType;
+        variable rnd : RandomPType;
         begin
+            wait until rising_edge(clk) and rst = '0';
             data   <=  rnd.Randslv(1)(1);
             valid  <=  rnd.Randslv(1)(1);
             full   <=  '0';
@@ -73,34 +77,43 @@ architecture testbench of gray_code_tb is
 
     cov_a_INTI_PROC : process
         begin
-            cov_a.AddBin(GenBin(0,0));
-            cov_a.AddBin(GenBin(1,1));
-            cov_a.AddBin(GenBin(2,2));
-            cov_a.AddBin(GenBin(3,3));
+            --Cov1 <= NewID("Cov1") ;
+            Cov2 <= NewID("Cov2") ;
+            wait for 0 ns ; -- Update Cov1
+            --AddBins(cov1,GenBin(0,0));
+            --AddBins(cov1,GenBin(1,1));
+            --AddBins(cov1,GenBin(2,2));
+            --AddBins(cov1,GenBin(3,3));
 
-            cov_b.AddBin(GenBin(0,0));
-            cov_b.AddBin(GenBin(1,1));
-            cov_b.AddBin(GenBin(2,2));
-            cov_b.AddBin(GenBin(3,3));
-    end process
+            AddBins(Cov2,GenBin(0,0));
+            AddBins(Cov2,GenBin(1,1));
+            AddBins(Cov2,GenBin(2,2));
+            AddBins(Cov2,GenBin(3,3));
+            wait ;
+    end process;
 
     SAMPLE_PROC : process
         begin
-            if valid = '1' then
-                cov_a.ICover(to_integer(unsigned(data)));
-            end if;
-            if dgb_write = '1' then
-                cov_b.ICover(to_integer(unsigned(dbg_data)));
-            end if;
+            --loop
+                wait until rising_edge(clk) and rst = '0';
+                --if valid = '1' then
+                --    cov_a.ICover(to_integer(data));
+                --end if;
+                if dgb_write = '1' then
+                    ICover(Cov2,to_integer(unsigned(dbg_data)));
+                end if;
+            --end loop ;
     end process;
 
     REPORT_PROC : process
         begin
-            wait until 100 ns;
-            report("Input Samples");
-            cov_a.WriteBin;
+            wait for 1000 ns;
+            --report("Input Samples");
+            --cov_a.WriteBin;
             report("Output Samples");
-            cov_a.WriteBin;
+            WriteBin(Cov2);
+
+            wait ;
     end process;
 
 end testbench ; -- testbench

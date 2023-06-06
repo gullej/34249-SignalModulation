@@ -1,5 +1,7 @@
-LIBRARY ieee;
-USE ieee.std_logic_1164.ALL;
+library ieee ;
+  use ieee.std_logic_1164.all ;
+  use ieee.numeric_std.all ;
+  use ieee.numeric_std_unsigned.all ;
 
 ENTITY gray_code IS
     GENERIC (
@@ -20,11 +22,10 @@ END gray_code;
 ARCHITECTURE gray_code_arc OF gray_code IS
 
     SIGNAL rx_dat_sr :  STD_LOGIC_VECTOR(DATA_WIDTH - 1 DOWNTO 0);
-    SIGNAL cnt       :  INTEGER RANGE 0 TO DATA_WIDTH - 1;
+    SIGNAL cnt       :  STD_LOGIC_VECTOR(1 DOWNTO 0);
 
 BEGIN
 
-    tx_dat <= rx_dat_sr XOR ('0' & rx_dat_sr(rx_dat_sr'LEFT - 1 DOWNTO 1));
 
     PROCESS (clk)
     BEGIN
@@ -32,20 +33,22 @@ BEGIN
             cnt   <= cnt;
             tx_wr <= '0';
             rx_dat_sr <= rx_dat_sr;
+            tx_dat <= rx_dat_sr XOR ('0' & rx_dat_sr(rx_dat_sr'LEFT DOWNTO 1));
 
             IF (rx_full = '0') THEN
                 IF (rx_val = '1') THEN
-                    rx_dat_sr <= rx_dat & rx_dat_sr(rx_dat_sr'LEFT - 1 DOWNTO 1);
+                    rx_dat_sr <=  rx_dat_sr(rx_dat_sr'LEFT-1 DOWNTO 0) & rx_dat;
                     cnt <= cnt + 1;
                 END IF;
 
-                IF (cnt = DATA_WIDTH) THEN
+                IF (to_integer(unsigned(cnt)) = DATA_WIDTH) THEN
+                    cnt <= (others => '0'); 
                     tx_wr <= '1';
                 END IF;
             END IF;
 
             IF (rst = '1') THEN
-                cnt <= 0;
+                cnt <= (others => '0');
             END IF;
         END IF;
 
