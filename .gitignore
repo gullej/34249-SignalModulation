@@ -9,16 +9,24 @@
 *.html
 *.bsf
 
+# ignore modelsim & sim folders
+logs/
+work/
+VHDL_LIBS/
+sim/
+
 # ignore simulation output of ModelSim
 wlf*
 *.wlf
 *.vstf
 *.ucdb
+*.xml
+*.yml
+*.mpf
 cov*/
 transcript*
 sc_dpiheader.h
 vsim.dbg
-sim/
 
 # matlab
 *.asv
