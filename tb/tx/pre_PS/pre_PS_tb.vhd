@@ -6,13 +6,13 @@ USE ieee.numeric_std_unsigned.ALL;
 LIBRARY osvvm;
 CONTEXT osvvm.OsvvmContext;
 
-ENTITY clk_sync_tb IS
+ENTITY pre_PS_tb IS
     GENERIC (
         DATA_WIDTH : INTEGER := 2
     );
-END ENTITY clk_sync_tb;
+END ENTITY pre_PS_tb;
 
-ARCHITECTURE testbench OF clk_sync_tb IS
+ARCHITECTURE testbench OF pre_PS_tb IS
 
     CONSTANT tperiod_clk_rd : TIME := 30 ns;
     CONSTANT tpd_rd : TIME := 2 ns;
@@ -23,6 +23,9 @@ ARCHITECTURE testbench OF clk_sync_tb IS
     SIGNAL   clk_wr : STD_LOGIC;
 
     SIGNAL rst : STD_LOGIC;
+
+    SIGNAL data   : STD_LOGIC;
+    SIGNAL valid  : STD_LOGIC;
 
     SIGNAL data_tx  : STD_LOGIC_VECTOR(DATA_WIDTH - 1 DOWNTO 0);
     SIGNAL data_rx  : STD_LOGIC_VECTOR(8 * DATA_WIDTH - 1 DOWNTO 0);
@@ -53,36 +56,52 @@ BEGIN
         tpd => tpd_wr
     );
 
-    DUT : ENTITY work.clk_sync
+    DUT_I : entity work.gray_code
+    generic map (
+        DATA_WIDTH  =>  DATA_WIDTH
+    )
+    port map(
+        rst     =>  rst,
+        clk     =>  clk_wr,
+        --
+        rx_dat  =>  data,
+        rx_val  =>  valid,
+        rx_full =>  tb_full,
+        --
+        tx_dat  =>  data_tx,
+        tx_wr   =>  tb_wr
+    );
+
+    DUT_II : ENTITY work.clk_sync
         GENERIC MAP(
             DATA_WIDTH => DATA_WIDTH
         )
         PORT MAP(
-            clk_rd => clk_rd,
-            clk_wr => clk_wr,
+            clk_rd   => clk_rd,
+            clk_wr   => clk_wr,
             --
-            rx_dat => data_tx,
-            rx_rd => tb_rd,
-            rx_wr => tb_wr,
+            rx_dat   => data_tx,
+            rx_rd    => tb_rd,
+            rx_wr    => tb_wr,
             --
-            tx_dat => data_rx,
+            tx_dat   => data_rx,
             tx_empty => tb_empty,
-            tx_full => tb_full
+            tx_full  => tb_full
         );
 
     RANDOM_GEN_WR : PROCESS
         VARIABLE rnd : RandomPType;
     BEGIN
         WAIT UNTIL rising_edge(clk_wr) AND rst = '0';
-        data_tx <= rnd.Randslv(DATA_WIDTH);
-        tb_wr <= rnd.Randslv(1)(1) and (not tb_full);
+        data <= rnd.Randslv(1)(1);
+        valid <= (not tb_full);
     END PROCESS;
 
     RANDOM_GEN_RD : PROCESS
     VARIABLE rnd : RandomPType;
     BEGIN
         WAIT UNTIL rising_edge(clk_rd) AND rst = '0';
-        tb_rd <= rnd.Randslv(1)(1) and (not tb_empty);
+        tb_rd <= (not tb_empty);
     END PROCESS;
 
     REPORT_PROC : PROCESS
