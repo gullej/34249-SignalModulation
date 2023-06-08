@@ -10,7 +10,7 @@ library osvvm ;
 library osvvm_common ;
   context osvvm_common.OsvvmCommonContext ;
 
-entity TLM_VC is
+entity gray_code_vc is
     generic (
         MODEL_ID_NAME   : string := "" ;
 
@@ -43,10 +43,10 @@ entity TLM_VC is
     -- Name for OSVVM Alerts
     constant MODEL_INSTANCE_NAME : string :=
     IfElse(MODEL_ID_NAME /= "",
-    MODEL_ID_NAME, PathTail(to_lower(TLM_VC'PATH_NAME))) ;
-end TLM_VC;
+    MODEL_ID_NAME, PathTail(to_lower(gray_code_vc'PATH_NAME))) ;
+end gray_code_vc;
 
-architecture Blocking of TLM_VC is
+architecture Blocking of gray_code_vc is
   signal ModelID : AlertLogIDType ;
 
 begin
@@ -96,7 +96,10 @@ begin
 
         WaitForClock(clk);
 
-      when CHECK =>
+      when Get =>
+        trans_rec.DataFromModel  <=  SafeResize(rx_data,trans_rec.DataFromModel'length);
+
+        WaitForClock(clk);
 
       when others => 
         Alert(ModelID, "Unimplemented Transaction: " & to_string(Operation), FAILURE);

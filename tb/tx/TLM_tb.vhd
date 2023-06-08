@@ -75,27 +75,19 @@ architecture testbench of TLM_tb is
       tpd         => tpd
     ) ;
 
-    Controller_Tx : entity work.TLM_VC
+    TX_GrayCode_VC : entity work.gray_code_vc
     port map (
-      clk             =>  clk,
-      rst             =>  rst,
-      tx_valid        =>  valid_gray,
-      tx_last         =>  open,
-      tx_data         =>  data_gray,
-      --Transactio int
-      trans_rec       =>  stream_tx_rec  
-  );
-
-    Controller_Rx : entity work.TLM_rx_VC
-    port map (
-      clk             =>  clk,
-      rst             =>  rst,
-      rx_data         =>  data_out_fifo,
-      rx_empty        =>  empty_fifo,
-      tx_read         =>  read_fifo,
-      --Transactio int
-      trans_rec       =>  stream_rx_rec  
-  );
+      clk              => clk,
+      rst              => rst,
+      rx_write         => write_fifo,
+      rx_data          => data_in_fifo,
+      tx_valid         => valid_gray,
+      tx_last          => open,
+      tx_data          => data_gray,
+      --Transactio interface
+      tx_trans_rec        => stream_tx_rec,
+      rx_trans_rec        => stream_rx_rec
+    );
 
   TestCtrl_1 : test_ctrl_e
     port map (

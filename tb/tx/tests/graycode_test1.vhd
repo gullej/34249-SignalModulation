@@ -28,6 +28,8 @@ architecture graycode_test1 of test_ctrl_e is
         variable Manager1Id      : AlertLogIDType;
         variable rnd             : RandomPType;
         variable data_generator  : std_logic_vector(1 DOWNTO 0);
+        variable data0           : std_logic_vector(0 DOWNTO 0);
+        variable data1           : std_logic_vector(0 DOWNTO 0);
         begin
             wait until rst = '0';  
             -- First Alignment to clock
@@ -36,27 +38,33 @@ architecture graycode_test1 of test_ctrl_e is
     
             for i in 1 to 480 loop
                 data_generator  :=  rnd.RandSlv(2);
+                data0  :=  data_generator(0 DOWNTO 0);
+                data1  :=  data_generator(1 DOWNTO 1);
                 Push(SB,data_generator);
-                Send(stream_tx_rec,data_generator(0));
-                Send(stream_tx_rec,data_generator(1));
+                Send(stream_tx_rec,data0);
+                Send(stream_tx_rec,data1);
             end loop;
     
             WaitForBarrier(TestDone);
             wait;
         end process MAGAGER_PROC_1;
     
-        MAGAGER_PROC_2 : process
+        Check_PROC : process
         variable data  : std_logic_vector(DATA_WIDTH*8-1 downto 0);
+        variable CheckID      : AlertLogIDType;
         begin
             wait until rst = '0';
-    
             WaitForClock(stream_tx_rec, 1);
+            CheckID := NewID("Check", TbID) ; 
+
             for i in 1 to (480/DATA_WIDTH) loop
-                Check(stream_tx_rec,data);
+                Get(stream_tx_rec,data);
+                Check(SB,data);
             end loop;
     
             WaitForBarrier(TestDone);
-        end process MAGAGER_PROC_2;
+            wait;
+        end process Check_PROC;
     
     end graycode_test1;
     
