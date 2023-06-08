@@ -19,8 +19,7 @@ entity TLM_VC is
         tperiod_Clk     : time := 10 ns ;
         DEFAULT_DELAY   : time := 1 ns ;
 
-        tpd_rx_valid    : time := DEFAULT_DELAY;
-        tpd_rx_last     : time := DEFAULT_DELAY;
+        tpd_rx_write    : time := DEFAULT_DELAY;
         tpd_rx_data     : time := DEFAULT_DELAY;
 
         tpd_tx_valid    : time := DEFAULT_DELAY;
@@ -30,6 +29,9 @@ entity TLM_VC is
     port (
         clk             :  in  std_logic;
         rst             :  in  std_logic;
+
+        rx_write        :  in  std_logic;
+        rx_data         :  in  std_logic_vector(DATA_WIDTH-1 DOWNTO 0);
 
         tx_valid        :  out std_logic;
         tx_last         :  out std_logic;
@@ -53,17 +55,20 @@ begin
   --  Initialize alerts
   ------------------------------------------------------------
   Initialize : process
-  variable ID : AlertLogIDType ;
+  variable ID : AlertLogIDType;
 begin
   -- Alerts
-  ID        := NewID(MODEL_INSTANCE_NAME) ;
-  ModelID   <= ID ;
+  ID        := NewID(MODEL_INSTANCE_NAME);
+  ModelID   <= ID;
   wait ;
 end process Initialize ;
 
 TransactionHandler : process
 alias Operation : StreamOperationType is trans_rec.Operation;
 begin
+  tx_valid  <=  'X';
+  tx_last   <=  'X';
+  tx_data   <=  (tx_data'range => 'X');
   wait for 0 ns;
 
   loop
@@ -88,6 +93,7 @@ begin
         tx_valid  <=  '1';
         tx_last   <=  '0';
         tx_data   <=  SafeResize(trans_rec.DataToModel,tx_data'length);
+
         WaitForClock(clk);
 
       when CHECK =>

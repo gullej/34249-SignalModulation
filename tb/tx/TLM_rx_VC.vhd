@@ -10,7 +10,7 @@ library osvvm ;
 library osvvm_common ;
   context osvvm_common.OsvvmCommonContext ;
 
-entity TLM_VC is
+entity TLM_rx_VC is
     generic (
         MODEL_ID_NAME   : string := "" ;
 
@@ -31,9 +31,10 @@ entity TLM_VC is
         clk             :  in  std_logic;
         rst             :  in  std_logic;
 
-        tx_valid        :  out std_logic;
-        tx_last         :  out std_logic;
-        tx_data         :  out std_logic_vector(0 DOWNTO 0);
+        rx_data         :  in  std_logic_vector(DATA_WIDTH*8-1 DOWNTO 0);
+        rx_empty        :  in  std_logic;
+        
+        tx_read         :  out std_logic;
 
         --Transactio interface
         trans_rec       :  inout StreamRecType
@@ -41,10 +42,10 @@ entity TLM_VC is
     -- Name for OSVVM Alerts
     constant MODEL_INSTANCE_NAME : string :=
     IfElse(MODEL_ID_NAME /= "",
-    MODEL_ID_NAME, PathTail(to_lower(TLM_VC'PATH_NAME))) ;
-end TLM_VC;
+    MODEL_ID_NAME, PathTail(to_lower(TLM_rx_VC'PATH_NAME))) ;
+end TLM_rx_VC;
 
-architecture Blocking of TLM_VC is
+architecture Blocking of TLM_rx_VC is
   signal ModelID : AlertLogIDType ;
 
 begin
@@ -84,13 +85,11 @@ begin
       when GET_ALERTLOG_ID =>
         trans_rec.IntFromModel <= integer(ModelID) ;
 
-      when SEND =>
-        tx_valid  <=  '1';
-        tx_last   <=  '0';
-        tx_data   <=  SafeResize(trans_rec.DataToModel,tx_data'length);
-        WaitForClock(clk);
-
       when CHECK =>
+        tx_read  <=  '1';
+        WaitForClock(clk);
+        tx_read  <=  '0';
+        trans_rec.DataFromModel  <=  SafeResize(rx_data,trans_rec.DataFromModel'length);
 
       when others => 
         Alert(ModelID, "Unimplemented Transaction: " & to_string(Operation), FAILURE);
