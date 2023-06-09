@@ -9,7 +9,7 @@ ENTITY pulse_shaper IS
         rst      : IN  STD_LOGIC;
         clk      : IN  STD_LOGIC;
         --
-        rx_dat_i : IN  STD_LOGIC_VECTOR(8 * DATA_WIDTH - 1 DOWNTO 0);
+        rx_dat_i : IN  STD_LOGIC_VECTOR(8 * DATA_WIDTH DOWNTO 0);
         -- { x[n-7] x[n-6] x[n-5] x[n-4] x[n-3] x[n-2] x[n-1] x[n] } 
         rx_val_i : IN  STD_LOGIC;
         --
@@ -21,32 +21,32 @@ END pulse_shaper;
 
 ARCHITECTURE pulse_shaper_arc OF pulse_shaper IS
 
-    CONSTANT coeff_h0  : signed(10 downto 0) := "00001100110";
-    CONSTANT coeff_h1  : signed(10 downto 0) := "00001100011";
-    CONSTANT coeff_h2  : signed(10 downto 0) := "00001011001";
-    CONSTANT coeff_h3  : signed(10 downto 0) := "00001001010";
-    CONSTANT coeff_h4  : signed(10 downto 0) := "00000111000";
-    CONSTANT coeff_h5  : signed(10 downto 0) := "00000100100";
-    CONSTANT coeff_h6  : signed(10 downto 0) := "00000010010";
-    CONSTANT coeff_h7  : signed(10 downto 0) := "00000000010";
-    CONSTANT coeff_h8  : signed(10 downto 0) := "11111110110";
-    CONSTANT coeff_h9  : signed(10 downto 0) := "11111110000";
-    CONSTANT coeff_h10 : signed(10 downto 0) := "11111101110";
-    CONSTANT coeff_h11 : signed(10 downto 0) := "11111110001";
-    CONSTANT coeff_h12 : signed(10 downto 0) := "11111110110";
-    CONSTANT coeff_h13 : signed(10 downto 0) := "11111111101";
-    CONSTANT coeff_h14 : signed(10 downto 0) := "00000000100";
-    CONSTANT coeff_h15 : signed(10 downto 0) := "00000001000";
-    CONSTANT coeff_h16 : signed(10 downto 0) := "00000000101";
+    CONSTANT coeff_h0  : signed(9 downto 0) := "0000110011";
+    CONSTANT coeff_h1  : signed(9 downto 0) := "0000110001";
+    CONSTANT coeff_h2  : signed(9 downto 0) := "0000101101";
+    CONSTANT coeff_h3  : signed(9 downto 0) := "0000100101";
+    CONSTANT coeff_h4  : signed(9 downto 0) := "0000011100";
+    CONSTANT coeff_h5  : signed(9 downto 0) := "0000010010";
+    CONSTANT coeff_h6  : signed(9 downto 0) := "0000001001";
+    CONSTANT coeff_h7  : signed(9 downto 0) := "0000000001";
+    CONSTANT coeff_h8  : signed(9 downto 0) := "1111111011";
+    CONSTANT coeff_h9  : signed(9 downto 0) := "1111111000";
+    CONSTANT coeff_h10 : signed(9 downto 0) := "1111110111";
+    CONSTANT coeff_h11 : signed(9 downto 0) := "1111111000";
+    CONSTANT coeff_h12 : signed(9 downto 0) := "1111111011";
+    CONSTANT coeff_h13 : signed(9 downto 0) := "1111111111";
+    CONSTANT coeff_h14 : signed(9 downto 0) := "0000000010";
+    CONSTANT coeff_h15 : signed(9 downto 0) := "0000000100";
+    CONSTANT coeff_h16 : signed(9 downto 0) := "0000000010";
 
     SIGNAL squoog : signed(13 downto 0);
 
     SIGNAl ctrl : STD_LOGIC_VECTOR(7 DOWNTO 0);
 
-    type sr_type_inputs is array (0 to 7) of signed(DATA_WIDTH - 1 downto 0);
+    type sr_type_inputs is array (0 to 7) of signed(DATA_WIDTH downto 0);
     SIGNAL shift_reg_i : sr_type_inputs;
 
-    type sr_type_x is array (0 to 40) of signed(DATA_WIDTH - 1 downto 0);
+    type sr_type_x is array (0 to 40) of signed(DATA_WIDTH downto 0);
     SIGNAL shift_reg_x : sr_type_x;
 
 BEGIN
@@ -61,23 +61,23 @@ BEGIN
 --        + h_5 * (x[n-11] + x[n-21]) + h_4 * (x[n-12] + x[n-20]) + h_3 * (x[n-13] + x[n-19]) + h_2 * (x[n-14] + x[n-18]) + h_1 * (x[n-15] + x[n-17]) + h_0 * x[n-16]
 
     tx_dat_o <= std_logic_vector(
-                coeff_h0    * (resize(shift_reg_x(0) , 3) + resize(shift_reg_x(32), 3)) 
-                + coeff_h15 * (resize(shift_reg_x(1) , 3) + resize(shift_reg_x(31), 3)) 
-                + coeff_h14 * (resize(shift_reg_x(1) , 3) + resize(shift_reg_x(30), 3)) 
-                + coeff_h13 * (resize(shift_reg_x(3) , 3) + resize(shift_reg_x(29), 3)) 
-                + coeff_h12 * (resize(shift_reg_x(4) , 3) + resize(shift_reg_x(28), 3))
-                + coeff_h11 * (resize(shift_reg_x(5) , 3) + resize(shift_reg_x(27), 3)) 
-                + coeff_h10 * (resize(shift_reg_x(6) , 3) + resize(shift_reg_x(26), 3)) 
-                + coeff_h9  * (resize(shift_reg_x(7) , 3) + resize(shift_reg_x(25), 3)) 
-                + coeff_h7  * (resize(shift_reg_x(9) , 3) + resize(shift_reg_x(23), 3)) 
-                + coeff_h8  * (resize(shift_reg_x(8) , 3) + resize(shift_reg_x(24), 3))
-                + coeff_h6  * (resize(shift_reg_x(10), 3) + resize(shift_reg_x(22), 3))
-                + coeff_h5  * (resize(shift_reg_x(11), 3) + resize(shift_reg_x(21), 3)) 
-                + coeff_h4  * (resize(shift_reg_x(12), 3) + resize(shift_reg_x(20), 3)) 
-                + coeff_h3  * (resize(shift_reg_x(13), 3) + resize(shift_reg_x(19), 3)) 
-                + coeff_h2  * (resize(shift_reg_x(14), 3) + resize(shift_reg_x(18), 3)) 
-                + coeff_h1  * (resize(shift_reg_x(15), 3) + resize(shift_reg_x(17), 3)) 
-                + coeff_h0  * resize(shift_reg_x(16),3) );
+                coeff_h0    * (resize(shift_reg_x(0) , 4) + resize(shift_reg_x(32), 4)) 
+                + coeff_h15 * (resize(shift_reg_x(1) , 4) + resize(shift_reg_x(31), 4)) 
+                + coeff_h14 * (resize(shift_reg_x(1) , 4) + resize(shift_reg_x(30), 4)) 
+                + coeff_h13 * (resize(shift_reg_x(3) , 4) + resize(shift_reg_x(29), 4)) 
+                + coeff_h12 * (resize(shift_reg_x(4) , 4) + resize(shift_reg_x(28), 4))
+                + coeff_h11 * (resize(shift_reg_x(5) , 4) + resize(shift_reg_x(27), 4)) 
+                + coeff_h10 * (resize(shift_reg_x(6) , 4) + resize(shift_reg_x(26), 4)) 
+                + coeff_h9  * (resize(shift_reg_x(7) , 4) + resize(shift_reg_x(25), 4)) 
+                + coeff_h7  * (resize(shift_reg_x(9) , 4) + resize(shift_reg_x(23), 4)) 
+                + coeff_h8  * (resize(shift_reg_x(8) , 4) + resize(shift_reg_x(24), 4))
+                + coeff_h6  * (resize(shift_reg_x(10), 4) + resize(shift_reg_x(22), 4))
+                + coeff_h5  * (resize(shift_reg_x(11), 4) + resize(shift_reg_x(21), 4)) 
+                + coeff_h4  * (resize(shift_reg_x(12), 4) + resize(shift_reg_x(20), 4)) 
+                + coeff_h3  * (resize(shift_reg_x(13), 4) + resize(shift_reg_x(19), 4)) 
+                + coeff_h2  * (resize(shift_reg_x(14), 4) + resize(shift_reg_x(18), 4)) 
+                + coeff_h1  * (resize(shift_reg_x(15), 4) + resize(shift_reg_x(17), 4)) 
+                + coeff_h0  * resize(shift_reg_x(16), 4) );
 
     SR : PROCESS(clk)
     BEGIN

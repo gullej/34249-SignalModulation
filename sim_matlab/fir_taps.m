@@ -22,5 +22,5 @@ a_norm = A - b_norm;
 taps_fi     = fi(taps,1,A-L,b)';
 taps_fi_bin = bin(taps_fi);
 
-taps_norm_fi     = fi(taps_norm,1,A-L,b_norm)';
+taps_norm_fi     = fi(taps_norm,1,A-L-1,b_norm-1)';
 taps_norm_fi_bin = bin(taps_norm_fi);
