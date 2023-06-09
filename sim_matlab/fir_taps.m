@@ -3,7 +3,7 @@ clear variables; close all; clc
 
 taps = cos_pulse(1,8,4,0.2);
 A = 14;
-L = 2+1; % (dependant on constellation size)
+L = 2 + 1; % (dependant on constellation size)
 
 alpha  = sum(abs(taps));     % formula
 lambda = ceil(log2(alpha)); % formula
