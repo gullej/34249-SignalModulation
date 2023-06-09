@@ -33,10 +33,11 @@ architecture testbench of TLM_tb is
   signal write_fifo     :  std_logic;
   signal full_fifo      :  std_logic;
   signal empty_fifo     :  std_logic;
+  signal dbg  :  std_logic;
 
   signal stream_tx_rec, stream_rx_rec : StreamRecType (
     DataToModel(0 DOWNTO 0),
-    DataFromModel(DATA_WIDTH*8-1 DOWNTO 0),
+    DataFromModel(1 DOWNTO 0),
     ParamToModel  (16 downto 0),
     ParamFromModel(16 downto 0)
   );
@@ -54,6 +55,7 @@ architecture testbench of TLM_tb is
   end component; 
 
   begin
+    dbg <= <<signal .TLM_tb.TestCtrl_1.dbg : std_logic>>;
     -- create Clock
     Osvvm.TbUtilPkg.CreateClock (
       Clk        => clk,
@@ -75,18 +77,25 @@ architecture testbench of TLM_tb is
       tpd         => tpd
     ) ;
 
-    TX_GrayCode_VC : entity work.gray_code_vc
+    TX_GrayCode_VC : entity work.graycode_tx_vc
+    port map (
+      clk              => clk,
+      rst              => rst,
+      tx_valid         => valid_gray,
+      tx_last          => open,
+      tx_data          => data_gray,
+      --Transactio interface
+      trans_rec        => stream_tx_rec
+    );
+
+    RX_GrayCode_VC : entity work.graycode_rx_vc
     port map (
       clk              => clk,
       rst              => rst,
       rx_write         => write_fifo,
       rx_data          => data_in_fifo,
-      tx_valid         => valid_gray,
-      tx_last          => open,
-      tx_data          => data_gray,
       --Transactio interface
-      tx_trans_rec        => stream_tx_rec,
-      rx_trans_rec        => stream_rx_rec
+      trans_rec        => stream_rx_rec
     );
 
   TestCtrl_1 : test_ctrl_e

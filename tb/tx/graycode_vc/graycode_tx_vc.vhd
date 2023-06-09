@@ -10,7 +10,7 @@ library osvvm ;
 library osvvm_common ;
   context osvvm_common.OsvvmCommonContext ;
 
-entity gray_code_vc is
+entity graycode_tx_vc is
     generic (
         MODEL_ID_NAME   : string := "" ;
 
@@ -19,9 +19,6 @@ entity gray_code_vc is
         tperiod_Clk     : time := 10 ns ;
         DEFAULT_DELAY   : time := 1 ns ;
 
-        tpd_rx_write    : time := DEFAULT_DELAY;
-        tpd_rx_data     : time := DEFAULT_DELAY;
-
         tpd_tx_valid    : time := DEFAULT_DELAY;
         tpd_tx_last     : time := DEFAULT_DELAY;
         tpd_tx_data     : time := DEFAULT_DELAY
@@ -29,9 +26,6 @@ entity gray_code_vc is
     port (
         clk             :  in  std_logic;
         rst             :  in  std_logic;
-
-        rx_write        :  in  std_logic;
-        rx_data         :  in  std_logic_vector(DATA_WIDTH-1 DOWNTO 0);
 
         tx_valid        :  out std_logic;
         tx_last         :  out std_logic;
@@ -43,10 +37,10 @@ entity gray_code_vc is
     -- Name for OSVVM Alerts
     constant MODEL_INSTANCE_NAME : string :=
     IfElse(MODEL_ID_NAME /= "",
-    MODEL_ID_NAME, PathTail(to_lower(gray_code_vc'PATH_NAME))) ;
-end gray_code_vc;
+    MODEL_ID_NAME, PathTail(to_lower(graycode_tx_vc'PATH_NAME))) ;
+end graycode_tx_vc;
 
-architecture Blocking of gray_code_vc is
+architecture Blocking of graycode_tx_vc is
   signal ModelID : AlertLogIDType ;
 
 begin
@@ -78,6 +72,7 @@ begin
       ack  =>  trans_rec.Ack
     );
 
+    tx_valid  <=  '0';
     case Operation is
        -- Execute Standard Directive Transactions
       when WAIT_FOR_TRANSACTION =>
@@ -93,11 +88,6 @@ begin
         tx_valid  <=  '1';
         tx_last   <=  '0';
         tx_data   <=  SafeResize(trans_rec.DataToModel,tx_data'length);
-
-        WaitForClock(clk);
-
-      when Get =>
-        trans_rec.DataFromModel  <=  SafeResize(rx_data,trans_rec.DataFromModel'length);
 
         WaitForClock(clk);
 

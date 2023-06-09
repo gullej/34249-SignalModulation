@@ -1,7 +1,22 @@
 architecture graycode_test1 of test_ctrl_e is
+    function Graycode( f_input : in std_logic_vector(1 DOWNTO 0)) return std_logic_vector is
+    begin
+      if f_input = "00" then
+          return "00";
+      elsif f_input = "01" then
+          return "01";
+      elsif f_input = "10" then
+          return "11";
+      elsif f_input = "11" then
+          return "10";
+      end if;
+    end function Graycode;
+
     signal Sync1, TestDone : integer_barrier := 1 ;
     signal TbID : AlertLogIDType ;  
     signal SB   : ScoreboardIDType;
+
+    signal dbg : std_logic := '0';
     begin
     
         CONTROL_PROC : process
@@ -30,6 +45,7 @@ architecture graycode_test1 of test_ctrl_e is
         variable data_generator  : std_logic_vector(1 DOWNTO 0);
         variable data0           : std_logic_vector(0 DOWNTO 0);
         variable data1           : std_logic_vector(0 DOWNTO 0);
+        variable gray_data       : std_logic_vector(1 DOWNTO 0);
         begin
             wait until rst = '0';  
             -- First Alignment to clock
@@ -40,9 +56,11 @@ architecture graycode_test1 of test_ctrl_e is
                 data_generator  :=  rnd.RandSlv(2);
                 data0  :=  data_generator(0 DOWNTO 0);
                 data1  :=  data_generator(1 DOWNTO 1);
-                Push(SB,data_generator);
-                Send(stream_tx_rec,data0);
+                gray_data  :=  Graycode(data_generator); 
+                dbg  <=  not dbg;
+                Push(SB,gray_data);
                 Send(stream_tx_rec,data1);
+                Send(stream_tx_rec,data0);
             end loop;
     
             WaitForBarrier(TestDone);
@@ -50,16 +68,18 @@ architecture graycode_test1 of test_ctrl_e is
         end process MAGAGER_PROC_1;
     
         Check_PROC : process
-        variable data  : std_logic_vector(DATA_WIDTH*8-1 downto 0);
+        variable data  : std_logic_vector(1 downto 0);
         variable CheckID      : AlertLogIDType;
         begin
             wait until rst = '0';
-            WaitForClock(stream_tx_rec, 1);
+            WaitForClock(stream_rx_rec, 1);
             CheckID := NewID("Check", TbID) ; 
 
-            for i in 1 to (480/DATA_WIDTH) loop
-                Get(stream_tx_rec,data);
-                Check(SB,data);
+            while(TRUE) loop
+                Get(stream_rx_rec,data);
+                if stream_rx_rec.BoolFromModel = TRUE then
+                  Check(SB,data);
+                end if;
             end loop;
     
             WaitForBarrier(TestDone);

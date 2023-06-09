@@ -25,23 +25,21 @@ ARCHITECTURE gray_code_arc OF gray_code IS
     SIGNAL cnt       :  STD_LOGIC_VECTOR(1 DOWNTO 0);
 
 BEGIN
-
+tx_dat <= rx_dat_sr XOR ('0' & rx_dat_sr(rx_dat_sr'LEFT DOWNTO 1));
 
     PROCESS (clk)
     BEGIN
         IF (rising_edge(clk)) THEN
             cnt   <= cnt;
             tx_wr <= '0';
-            rx_dat_sr <= rx_dat_sr;
-            tx_dat <= rx_dat_sr XOR ('0' & rx_dat_sr(rx_dat_sr'LEFT DOWNTO 1));
+            rx_dat_sr <=  rx_dat_sr(rx_dat_sr'LEFT-1 DOWNTO 0) & rx_dat;
 
             IF (rx_full = '0') THEN
                 IF (rx_val = '1') THEN
-                    rx_dat_sr <=  rx_dat_sr(rx_dat_sr'LEFT-1 DOWNTO 0) & rx_dat;
                     cnt <= cnt + 1;
                 END IF;
 
-                IF (to_integer(unsigned(cnt)) = DATA_WIDTH) THEN
+                IF (to_integer(unsigned(cnt)) = DATA_WIDTH-1) THEN
                     cnt <= (others => '0'); 
                     tx_wr <= '1';
                 END IF;
