@@ -21,7 +21,7 @@ architecture graycode_test1 of test_ctrl_e is
     
         CONTROL_PROC : process
         begin
-            SetTestName("continuous stream test");
+            SetTestName("Gray code test");
             SetLogEnable(PASSED, TRUE);
             TbID <= NewID("Testbench");
             SB   <= NewID("Graycode_SB");
