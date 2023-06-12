@@ -87,7 +87,7 @@ begin
       when SEND =>
         tx_valid  <=  '1';
         tx_last   <=  '0';
-        tx_data   <=  SafeResize(trans_rec.DataToModel,tx_data'length);
+        tx_data   <=  SafeResize(trans_rec.DataToModel, tx_data'length);
 
         WaitForClock(clk);
 

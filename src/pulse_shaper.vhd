@@ -9,7 +9,7 @@ ENTITY pulse_shaper IS
         rst      : IN  STD_LOGIC;
         clk      : IN  STD_LOGIC;
         --
-        rx_dat_i : IN  STD_LOGIC_VECTOR(8 * DATA_WIDTH DOWNTO 0);
+        rx_dat_i : IN  STD_LOGIC_VECTOR(8 * DATA_WIDTH - 1 DOWNTO 0);
         -- { x[n-7] x[n-6] x[n-5] x[n-4] x[n-3] x[n-2] x[n-1] x[n] } 
         rx_val_i : IN  STD_LOGIC;
         --

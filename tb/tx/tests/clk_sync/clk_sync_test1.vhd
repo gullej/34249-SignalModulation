@@ -16,6 +16,7 @@ architecture clk_sync_test1 of test_ctrl_e is
     signal TbID : AlertLogIDType ;
     signal graycode_SB   : ScoreboardIDType;
     signal clk_sync_SB   : ScoreboardIDType;
+    signal Cov           : CoverageIDType;
 
     constant Num_of_Tests : integer := 480;
 
@@ -28,8 +29,15 @@ architecture clk_sync_test1 of test_ctrl_e is
             TbID <= NewID("Testbench");
             graycode_SB   <= NewID("GrayCode_SB");
             clk_sync_SB   <= NewID("Clk_sync_SB");
+            Cov  <= NewID("Clk_sync_Cov");
     
             wait for 0 ns ;  wait for 0 ns;
+
+            AddBins(Cov, GenBin(0, 0));
+            AddBins(Cov, GenBin(16384, 16384));
+            AddBins(Cov, GenBin(32768, 32768));
+            AddBins(Cov, GenBin(49152, 49152));
+            AddBins(Cov, 0, GenBin(0, 65535, 1));
     
             wait until rst = '0';
             ClearAlerts;
@@ -37,7 +45,8 @@ architecture clk_sync_test1 of test_ctrl_e is
             WaitForBarrier(TestDone, 35 ms);
             AlertIf(now >= 35 ms, "Test finished due to timeout");
     
-            EndOfTestReports; 
+            EndOfTestReports;
+            WriteBin(Cov);
             std.env.stop(GetAlertCount);
             wait;
         end process;
@@ -117,7 +126,7 @@ architecture clk_sync_test1 of test_ctrl_e is
             while(GetPushCount(clk_sync_SB) < Num_of_Tests) loop
                 Get(sync_tx_rec,data_generator);
                 expected_data  :=  data_generator & (7 * DATA_WIDTH - 1 DOWNTO 0 => '0');
-                log("Num of Pushs: " & to_string(GetPushCount(clk_sync_SB)));
+                --log("Num of Pushs: " & to_string(GetPushCount(clk_sync_SB)));
                 if sync_tx_rec.BoolFromModel = TRUE then
                   Push(clk_sync_SB,expected_data);
                 end if;
@@ -141,8 +150,9 @@ architecture clk_sync_test1 of test_ctrl_e is
 
             while(GetCheckCount(clk_sync_SB) < Num_of_Tests) loop
                 Get(sync_rx_rec,data);
-                log("Num of Checks: " & to_string(GetCheckCount(clk_sync_SB)));
+                --log("Num of Checks: " & to_string(GetCheckCount(clk_sync_SB)));
                 if sync_rx_rec.BoolFromModel = TRUE then
+                  ICover(Cov, to_integer(unsigned(data)));
                   Check(clk_sync_SB,data);
                 end if;
             end loop;
