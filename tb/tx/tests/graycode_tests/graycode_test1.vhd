@@ -39,7 +39,7 @@ architecture graycode_test1 of test_ctrl_e is
             wait;
         end process;
     
-        MAGAGER_PROC_1 : process
+        GC_Generate_Data : process
         variable Manager1Id      : AlertLogIDType;
         variable rnd             : RandomPType;
         variable data_generator  : std_logic_vector(1 DOWNTO 0);
@@ -65,7 +65,7 @@ architecture graycode_test1 of test_ctrl_e is
     
             WaitForBarrier(TestDone);
             wait;
-        end process MAGAGER_PROC_1;
+        end process GC_Generate_Data;
     
         Check_PROC : process
         variable data  : std_logic_vector(1 downto 0);

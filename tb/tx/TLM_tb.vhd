@@ -33,11 +33,26 @@ architecture testbench of TLM_tb is
   signal write_fifo     :  std_logic;
   signal full_fifo      :  std_logic;
   signal empty_fifo     :  std_logic;
+
   signal dbg  :  std_logic;
 
   signal stream_tx_rec, stream_rx_rec : StreamRecType (
     DataToModel(0 DOWNTO 0),
     DataFromModel(1 DOWNTO 0),
+    ParamToModel  (16 downto 0),
+    ParamFromModel(16 downto 0)
+  );
+
+  signal  sync_tx_rec : StreamRecType (
+    DataToModel(DATA_WIDTH - 1 DOWNTO 0),
+    DataFromModel(DATA_WIDTH - 1 DOWNTO 0),
+    ParamToModel  (16 downto 0),
+    ParamFromModel(16 downto 0)
+  );
+
+  signal  sync_rx_rec : StreamRecType (
+    DataToModel(8 * DATA_WIDTH - 1 DOWNTO 0),
+    DataFromModel(8 * DATA_WIDTH - 1 DOWNTO 0),
     ParamToModel  (16 downto 0),
     ParamFromModel(16 downto 0)
   );
@@ -49,13 +64,17 @@ architecture testbench of TLM_tb is
       --Transaction interface
       
       stream_tx_rec  :  inout StreamRecType;
-      stream_rx_rec  :  inout StreamRecType
+      stream_rx_rec  :  inout StreamRecType;
+      sync_tx_rec    :  inout StreamRecType;
+      sync_rx_rec    :  inout StreamRecType
   
     );
   end component; 
 
   begin
-    dbg <= <<signal .TLM_tb.TestCtrl_1.dbg : std_logic>>;
+    read_fifo  <=  not empty_fifo;
+
+    --dbg <= <<signal .TLM_tb.TestCtrl_1.dbg : std_logic>>;
     -- create Clock
     Osvvm.TbUtilPkg.CreateClock (
       Clk        => clk,
@@ -77,6 +96,9 @@ architecture testbench of TLM_tb is
       tpd         => tpd
     ) ;
 
+    ------------------------------------------
+    -- Graycode TLM                         --
+    ------------------------------------------
     TX_GrayCode_VC : entity work.graycode_tx_vc
     port map (
       clk              => clk,
@@ -98,14 +120,39 @@ architecture testbench of TLM_tb is
       trans_rec        => stream_rx_rec
     );
 
+    ------------------------------------------
+    -- Clk_sync TLM                         --
+    ------------------------------------------
+    Clk_Sync_VC : entity work.clk_sync_rx_vc
+    port map (
+      clk_rd            =>  clk_b,
+      clk_wr            =>  clk,
+      rst               =>  rst,
+
+      rx_dat_in         =>  data_in_fifo,
+      rx_rd_in          =>  read_fifo,
+      rx_wr_in          =>  write_fifo,
+      --
+      rx_dat_out	      =>  data_out_fifo,
+      rx_empty_out      =>  empty_fifo,
+      rx_full_out       =>  full_fifo,
+
+
+      --Transaction interface
+      rx_trans_rec_in   =>  sync_tx_rec,
+      rx_trans_rec_out  =>  sync_rx_rec
+    );
+
   TestCtrl_1 : test_ctrl_e
     port map (
       rst            =>  rst,
       stream_tx_rec  =>  stream_tx_rec,
-      stream_rx_rec  =>  stream_rx_rec
+      stream_rx_rec  =>  stream_rx_rec,
+      sync_tx_rec    =>  sync_tx_rec,
+      sync_rx_rec    =>  sync_rx_rec
     );
 
-    DUT_I : entity work.gray_code
+    GrayCode_COMP : entity work.gray_code
     generic map (
         DATA_WIDTH  =>  DATA_WIDTH
     )
@@ -121,7 +168,7 @@ architecture testbench of TLM_tb is
         tx_wr   =>  write_fifo
     );
 
-    DUT_II : ENTITY work.clk_sync
+    Clk_Sync_COMP : ENTITY work.clk_sync
         GENERIC MAP(
             DATA_WIDTH => DATA_WIDTH
         )
