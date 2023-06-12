@@ -39,14 +39,12 @@ ARCHITECTURE pulse_shaper_arc OF pulse_shaper IS
     CONSTANT coeff_h15 : signed(9 downto 0) := "0000000100";
     CONSTANT coeff_h16 : signed(9 downto 0) := "0000000010";
 
-    SIGNAL squoog : signed(13 downto 0);
-
     SIGNAl ctrl : STD_LOGIC_VECTOR(7 DOWNTO 0);
 
-    type sr_type_inputs is array (0 to 7) of signed(DATA_WIDTH downto 0);
+    type sr_type_inputs is array (0 to 7) of signed(DATA_WIDTH - 1 downto 0);
     SIGNAL shift_reg_i : sr_type_inputs;
 
-    type sr_type_x is array (0 to 40) of signed(DATA_WIDTH downto 0);
+    type sr_type_x is array (0 to 40) of signed(DATA_WIDTH - 1 downto 0);
     SIGNAL shift_reg_x : sr_type_x;
 
 BEGIN
@@ -104,8 +102,11 @@ BEGIN
                 shift_reg_i(2) <= signed(rx_dat_i(3 * DATA_WIDTH - 1 DOWNTO 2 * DATA_WIDTH));
                 shift_reg_i(1) <= signed(rx_dat_i(2 * DATA_WIDTH - 1 DOWNTO 1 * DATA_WIDTH));
                 shift_reg_i(0) <= signed(rx_dat_i(1 * DATA_WIDTH - 1 DOWNTO 0 * DATA_WIDTH));
-            END IF;        
+            END IF;
+
+            IF rst = '1' then
+                ctrl  <=  (7 DOWNTO 1 => '0') & '1';
+            end if;     
         END IF;
     END PROCESS SR;
-
 END pulse_shaper_arc;

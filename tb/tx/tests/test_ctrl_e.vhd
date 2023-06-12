@@ -23,7 +23,8 @@ entity test_ctrl_e is
     stream_tx_rec  :  inout StreamRecType;
     stream_rx_rec  :  inout StreamRecType;
     sync_tx_rec    :  inout StreamRecType;
-    sync_rx_rec    :  inout StreamRecType
+    sync_rx_rec    :  inout StreamRecType;
+    pulse_rx_rec   :  inout StreamRecType
 
   );
 end test_ctrl_e;

@@ -36,6 +36,10 @@ architecture testbench of TLM_tb is
 
   signal dbg  :  std_logic;
 
+  signal pulse_shaper_valid_in   :  std_logic;
+  signal pulse_shaper_valid_out  :  std_logic;
+  signal pulse_shaper_data_out   :  std_logic_vector(13 DOWNTO 0);
+
   signal stream_tx_rec, stream_rx_rec : StreamRecType (
     DataToModel(0 DOWNTO 0),
     DataFromModel(1 DOWNTO 0),
@@ -57,6 +61,14 @@ architecture testbench of TLM_tb is
     ParamFromModel(16 downto 0)
   );
 
+  signal  pulse_tx_rec, pulse_rx_rec : StreamRecType (
+    DataToModel(8 * DATA_WIDTH - 1 DOWNTO 0),
+    DataFromModel(13 DOWNTO 0),
+    ParamToModel  (16 downto 0),
+    ParamFromModel(16 downto 0)
+  );
+
+
   component test_ctrl_e is
     port (
       rst  :  in  std_logic;
@@ -66,7 +78,8 @@ architecture testbench of TLM_tb is
       stream_tx_rec  :  inout StreamRecType;
       stream_rx_rec  :  inout StreamRecType;
       sync_tx_rec    :  inout StreamRecType;
-      sync_rx_rec    :  inout StreamRecType
+      sync_rx_rec    :  inout StreamRecType;
+      pulse_rx_rec   :  inout StreamRecType
   
     );
   end component; 
@@ -143,13 +156,28 @@ architecture testbench of TLM_tb is
       rx_trans_rec_out  =>  sync_rx_rec
     );
 
+    Pulse_Shaper_VC : entity work.pulseshaper_rx_vc
+      port map (
+        clk             =>  clk_b,
+        rst             =>  rst,
+        rx_valid        =>  pulse_shaper_valid_out,
+        rx_data         =>  pulse_shaper_data_out,
+        tx_valid        =>  open,
+        tx_data         =>  open,
+        -- Input Transa
+        rx_trans_rec    =>  pulse_rx_rec,
+        -- Output Trans
+        tx_trans_rec    =>  pulse_tx_rec
+      );
+
   TestCtrl_1 : test_ctrl_e
     port map (
       rst            =>  rst,
       stream_tx_rec  =>  stream_tx_rec,
       stream_rx_rec  =>  stream_rx_rec,
       sync_tx_rec    =>  sync_tx_rec,
-      sync_rx_rec    =>  sync_rx_rec
+      sync_rx_rec    =>  sync_rx_rec,
+      pulse_rx_rec   =>  pulse_rx_rec
     );
 
     GrayCode_COMP : entity work.gray_code
@@ -184,4 +212,26 @@ architecture testbench of TLM_tb is
             tx_empty => empty_fifo,
             tx_full  => full_fifo
         );
+
+    PulseShaper_Valid : process(clk_b)
+    begin
+      pulse_shaper_valid_in  <=  read_fifo;
+    end process PulseShaper_Valid;
+
+    PulseShaper_COMP : entity work.pulse_shaper
+      generic map (
+        DATA_WIDTH  =>  DATA_WIDTH
+      )
+      PORT MAP (
+        rst       =>  rst,
+        clk       =>  clk_b,
+        --
+        rx_dat_i  =>  data_out_fifo,
+        -- 
+        rx_val_i  =>  pulse_shaper_valid_in,
+        --
+        tx_dat_o  =>  pulse_shaper_data_out,
+        -- 
+        tx_val_o  =>  pulse_shaper_valid_out
+      );
 end testbench;

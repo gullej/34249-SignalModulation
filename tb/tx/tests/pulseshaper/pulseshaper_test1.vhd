@@ -29,17 +29,19 @@ architecture pulseshaper_test1 of test_ctrl_e is
             TbID <= NewID("Testbench");
             SB   <= NewID("PulseShaper_SB");
             Cov  <= NewID("PulseShaper_Cov");
-            AddBins(Cov, GenBin(0,16383));
     
             wait for 0 ns ;  wait for 0 ns;
     
+            AddBins(Cov, GenBin(0,16383));
+
             wait until rst = '0';
             ClearAlerts;
     
             WaitForBarrier(TestDone, 35 ms);
             AlertIf(now >= 35 ms, "Test finished due to timeout");
     
-            EndOfTestReports; 
+            EndOfTestReports;
+            WriteBin(Cov);
             std.env.stop(GetAlertCount);
             wait;
         end process;
@@ -48,7 +50,7 @@ architecture pulseshaper_test1 of test_ctrl_e is
         -- GrayCode data Generator --
         -----------------------------
         GC_Generate_Data : process
-        variable Manager1Id      : AlertLogIDType;
+        variable GenId           : AlertLogIDType;
         variable rnd             : RandomPType;
         variable data_generator  : std_logic_vector(1 DOWNTO 0);
         variable data0           : std_logic_vector(0 DOWNTO 0);
@@ -58,13 +60,13 @@ architecture pulseshaper_test1 of test_ctrl_e is
             wait until rst = '0';  
             -- First Alignment to clock
             WaitForClock(stream_tx_rec, 1);
-            Manager1Id := NewID("Manager", TbID) ; 
+            GenId := NewID("Manager", TbID);
     
-            for i in 1 to Num_of_Tests loop
+            while (not(IsCovered(Cov))) loop
                 data_generator  :=  rnd.RandSlv(2);
-                data0  :=  data_generator(0 DOWNTO 0);
-                data1  :=  data_generator(1 DOWNTO 1);
-                gray_data  :=  Graycode(data_generator); 
+                data0           :=  data_generator(0 DOWNTO 0);
+                data1           :=  data_generator(1 DOWNTO 1);
+                gray_data       :=  Graycode(data_generator); 
                 --Push(graycode_SB,gray_data);
                 Send(stream_tx_rec,data1);
                 Send(stream_tx_rec,data0);
@@ -75,12 +77,18 @@ architecture pulseshaper_test1 of test_ctrl_e is
         end process GC_Generate_Data;
 
         Cov_PROC : process
+        variable CovId  :  AlertLogIDType;
+        variable data   :  std_logic_vector(13 DOWNTO 0);
         begin
             wait until rst = '0';
-            WaitForClock();
+            WaitForClock(pulse_rx_rec, 1);
+            CovId  :=  NewID("Covrage_test", TbID);
 
-            while (!(IsCovered(Cov))) loop
-                
+            while (not(IsCovered(Cov))) loop
+                Get(pulse_rx_rec,data);
+                if pulse_rx_rec.BoolFromModel = TRUE then
+                    ICover(Cov,to_integer(data));
+                end if;
             end loop;
             
             WaitForBarrier(TestDone);
