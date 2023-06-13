@@ -2,15 +2,17 @@ architecture graycode_test1 of test_ctrl_e is
     function Graycode( f_input : in std_logic_vector(1 DOWNTO 0)) return std_logic_vector is
     begin
       if f_input = "00" then
-          return "00";
+          return "101";
       elsif f_input = "01" then
-          return "01";
-      elsif f_input = "10" then
-          return "11";
+          return "111";
       elsif f_input = "11" then
-          return "10";
+          return "001";
+      elsif f_input = "10" then
+          return "011";
       end if;
     end function Graycode;
+
+    constant Num_of_Tests  :  integer := 480;
 
     signal Sync1, TestDone : integer_barrier := 1 ;
     signal TbID : AlertLogIDType ;  
@@ -45,14 +47,14 @@ architecture graycode_test1 of test_ctrl_e is
         variable data_generator  : std_logic_vector(1 DOWNTO 0);
         variable data0           : std_logic_vector(0 DOWNTO 0);
         variable data1           : std_logic_vector(0 DOWNTO 0);
-        variable gray_data       : std_logic_vector(1 DOWNTO 0);
+        variable gray_data       : std_logic_vector(DATA_WIDTH - 1 DOWNTO 0);
         begin
             wait until rst = '0';  
             -- First Alignment to clock
             WaitForClock(stream_tx_rec, 1) ;
             Manager1Id := NewID("Manager", TbID) ; 
     
-            for i in 1 to 480 loop
+            for i in 1 to Num_of_Tests loop
                 data_generator  :=  rnd.RandSlv(2);
                 data0  :=  data_generator(0 DOWNTO 0);
                 data1  :=  data_generator(1 DOWNTO 1);
@@ -68,14 +70,14 @@ architecture graycode_test1 of test_ctrl_e is
         end process GC_Generate_Data;
     
         Check_PROC : process
-        variable data  : std_logic_vector(1 downto 0);
+        variable data  : std_logic_vector(DATA_WIDTH - 1 downto 0);
         variable CheckID      : AlertLogIDType;
         begin
             wait until rst = '0';
             WaitForClock(stream_rx_rec, 1);
             CheckID := NewID("Check", TbID) ; 
 
-            while(TRUE) loop
+            while(GetCheckCount(SB) < Num_of_Tests) loop
                 Get(stream_rx_rec,data);
                 if stream_rx_rec.BoolFromModel = TRUE then
                   Check(SB,data);

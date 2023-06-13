@@ -14,7 +14,7 @@ entity graycode_rx_vc is
     generic (
         MODEL_ID_NAME   : string := "" ;
 
-        DATA_WIDTH      : integer := 2;
+        DATA_WIDTH      : integer;
 
         tperiod_Clk     : time := 10 ns ;
         DEFAULT_DELAY   : time := 1 ns ;

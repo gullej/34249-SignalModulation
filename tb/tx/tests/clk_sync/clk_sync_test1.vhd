@@ -2,13 +2,13 @@ architecture clk_sync_test1 of test_ctrl_e is
   function Graycode( f_input : in std_logic_vector(1 DOWNTO 0)) return std_logic_vector is
     begin
       if f_input = "00" then
-          return "00";
+          return "101";
       elsif f_input = "01" then
-          return "01";
-      elsif f_input = "10" then
-          return "11";
+          return "111";
       elsif f_input = "11" then
-          return "10";
+          return "001";
+      elsif f_input = "10" then
+          return "011";
       end if;
     end function Graycode;
 
@@ -33,11 +33,11 @@ architecture clk_sync_test1 of test_ctrl_e is
     
             wait for 0 ns ;  wait for 0 ns;
 
-            AddBins(Cov, GenBin(0, 0));
-            AddBins(Cov, GenBin(16384, 16384));
-            AddBins(Cov, GenBin(32768, 32768));
-            AddBins(Cov, GenBin(49152, 49152));
-            AddBins(Cov, 0, GenBin(0, 65535, 1));
+            AddBins(Cov, GenBin(2097152, 2097152));
+            AddBins(Cov, GenBin(6291456, 6291456));
+            AddBins(Cov, GenBin(10485760, 10485760));
+            AddBins(Cov, GenBin(14680064, 14680064));
+            AddBins(Cov, 0, GenBin(0, 16777215, 1));
     
             wait until rst = '0';
             ClearAlerts;
@@ -60,7 +60,7 @@ architecture clk_sync_test1 of test_ctrl_e is
         variable data_generator  : std_logic_vector(1 DOWNTO 0);
         variable data0           : std_logic_vector(0 DOWNTO 0);
         variable data1           : std_logic_vector(0 DOWNTO 0);
-        variable gray_data       : std_logic_vector(1 DOWNTO 0);
+        variable gray_data       : std_logic_vector(2 DOWNTO 0);
         --variable push_cnt        : integer;
         begin
             wait until rst = '0';  
@@ -72,7 +72,7 @@ architecture clk_sync_test1 of test_ctrl_e is
                 data_generator  :=  rnd.RandSlv(2);
                 data0  :=  data_generator(0 DOWNTO 0);
                 data1  :=  data_generator(1 DOWNTO 1);
-                gray_data  :=  Graycode(data_generator); 
+                gray_data  :=  Graycode(data_generator);
                 --push_cnt  :=  GetPushCount(graycode_SB);
                 --log("Num of Pushs: " & to_string(push_cnt));
                 Push(graycode_SB,gray_data);
@@ -88,7 +88,7 @@ architecture clk_sync_test1 of test_ctrl_e is
         -- GrayCode verify data    --
         -----------------------------
         GC_Check_PROC : process
-        variable data       : std_logic_vector(1 downto 0);
+        variable data       : std_logic_vector(2 downto 0);
         variable CheckID    : AlertLogIDType;
         --variable check_cnt  :  integer;
         begin

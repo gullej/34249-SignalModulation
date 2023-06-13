@@ -44,7 +44,7 @@ ARCHITECTURE pulse_shaper_arc OF pulse_shaper IS
     type sr_type_inputs is array (0 to 7) of signed(DATA_WIDTH - 1 downto 0);
     SIGNAL shift_reg_i : sr_type_inputs;
 
-    type sr_type_x is array (0 to 40) of signed(DATA_WIDTH - 1 downto 0);
+    type sr_type_x is array (0 to 40) of signed(DATA_WIDTH downto 0);
     SIGNAL shift_reg_x : sr_type_x;
 
 BEGIN

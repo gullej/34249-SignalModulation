@@ -13,7 +13,7 @@ library osvvm_common ;
 
 entity test_ctrl_e is
   generic (
-    DATA_WIDTH  :  integer := 2
+    DATA_WIDTH  :  integer := 3
   );
   port (
     rst  :  in  std_logic;

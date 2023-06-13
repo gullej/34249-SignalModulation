@@ -3,7 +3,7 @@ library ieee ;
   use ieee.numeric_std.all ;
   use ieee.numeric_std_unsigned.all ;
 
-ENTITY pa_mod IS
+ENTITY pam_map IS
     GENERIC (
         DATA_WIDTH : INTEGER);
     PORT (
@@ -17,12 +17,11 @@ ENTITY pa_mod IS
         tx_dat  :  OUT STD_LOGIC_VECTOR(DATA_WIDTH - 1 DOWNTO 0);
         tx_wr   :  OUT STD_LOGIC
     );
-END pa_mod;
+END pam_map;
 
-ARCHITECTURE pa_mod_arc OF pa_mod IS
+ARCHITECTURE pam_map_arc OF pam_map IS
 
     SIGNAL rx_dat_sr :  STD_LOGIC_VECTOR(DATA_WIDTH - 2 DOWNTO 0);
-    SIGNAL tx_dat_c :  STD_LOGIC_VECTOR(DATA_WIDTH - 1 DOWNTO 0);
     SIGNAL cnt       :  STD_LOGIC_VECTOR(1 DOWNTO 0);
 
 BEGIN
@@ -34,19 +33,19 @@ begin
 case sel is
     when "00" =>
         -- -3
-        tx_dat_c <= "101";
+        tx_dat <= "101";
     when "01" =>
         -- -1
-        tx_dat_c <= "111";
+        tx_dat <= "111";
     when "11" =>
         -- +1
-        tx_dat_c <= "001";
+        tx_dat <= "001";
     when "10" =>
         -- +3
-        tx_dat_c <= "011";
+        tx_dat <= "011";
     when others =>
         -- ?
-        tx_dat_c <= "000";
+        tx_dat <= "000";
 end case;
 end process;
 
@@ -56,7 +55,6 @@ end process;
             cnt   <= cnt;
             tx_wr <= '0';
             rx_dat_sr <= rx_dat_sr;
-            tx_dat <= tx_dat_c;
 
 
             IF (rx_full = '0') THEN
@@ -65,8 +63,8 @@ end process;
                     cnt <= cnt + 1;
                 END IF;
 
-                IF (to_integer(unsigned(cnt)) = DATA_WIDTH - 1) THEN
-                    cnt <= (others => '0'); 
+                IF (to_integer(unsigned(cnt)) = DATA_WIDTH - 2) THEN
+                    cnt <= (others => '0');
                     tx_wr <= '1';
                 END IF;
             END IF;
@@ -78,4 +76,4 @@ end process;
 
     END PROCESS;
     
-END pa_mod_arc;
+END pam_map_arc;

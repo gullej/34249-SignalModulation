@@ -13,7 +13,7 @@ entity TLM_tb is
 end entity TLM_tb ;
 
 architecture testbench of TLM_tb is
-  constant DATA_WIDTH : integer := 2; -- Data width at transceiver input interface
+  constant DATA_WIDTH : integer := 3; -- Data width at transceiver input interface
   constant CONSTALATION_SIZE : integer := 2; -- 1: PAM2 | 2: PAM4 | 3: PAM8
 
   constant tperiod_Clk   : time := 10 ns ;
@@ -42,7 +42,7 @@ architecture testbench of TLM_tb is
 
   signal stream_tx_rec, stream_rx_rec : StreamRecType (
     DataToModel(0 DOWNTO 0),
-    DataFromModel(1 DOWNTO 0),
+    DataFromModel(DATA_WIDTH - 1 DOWNTO 0),
     ParamToModel  (16 downto 0),
     ParamFromModel(16 downto 0)
   );
@@ -113,6 +113,9 @@ architecture testbench of TLM_tb is
     -- Graycode TLM                         --
     ------------------------------------------
     TX_GrayCode_VC : entity work.graycode_tx_vc
+    GENERIC MAP(
+            DATA_WIDTH => DATA_WIDTH
+        )
     port map (
       clk              => clk,
       rst              => rst,
@@ -124,6 +127,9 @@ architecture testbench of TLM_tb is
     );
 
     RX_GrayCode_VC : entity work.graycode_rx_vc
+    GENERIC MAP(
+            DATA_WIDTH => DATA_WIDTH
+        )
     port map (
       clk              => clk,
       rst              => rst,
@@ -137,6 +143,9 @@ architecture testbench of TLM_tb is
     -- Clk_sync TLM                         --
     ------------------------------------------
     Clk_Sync_VC : entity work.clk_sync_rx_vc
+    GENERIC MAP(
+            DATA_WIDTH => DATA_WIDTH
+        )
     port map (
       clk_rd            =>  clk_b,
       clk_wr            =>  clk,
@@ -157,6 +166,9 @@ architecture testbench of TLM_tb is
     );
 
     Pulse_Shaper_VC : entity work.pulseshaper_rx_vc
+      GENERIC MAP(
+        DATA_WIDTH => DATA_WIDTH
+      )
       port map (
         clk             =>  clk_b,
         rst             =>  rst,
@@ -171,6 +183,9 @@ architecture testbench of TLM_tb is
       );
 
   TestCtrl_1 : test_ctrl_e
+  GENERIC MAP(
+        DATA_WIDTH => DATA_WIDTH
+      )
     port map (
       rst            =>  rst,
       stream_tx_rec  =>  stream_tx_rec,
@@ -180,7 +195,7 @@ architecture testbench of TLM_tb is
       pulse_rx_rec   =>  pulse_rx_rec
     );
 
-    GrayCode_COMP : entity work.gray_code
+    GrayCode_COMP : entity work.pam_map
     generic map (
         DATA_WIDTH  =>  DATA_WIDTH
     )

@@ -6,13 +6,13 @@ library ieee ;
 library osvvm ;
   context osvvm.OsvvmContext ;
 
-entity pa_mod_tb is
+entity pam_map_tb is
     generic(
         DATA_WIDTH : integer := 3
     );
-end entity pa_mod_tb;
+end entity pam_map_tb;
 
-architecture testbench of pa_mod_tb is
+architecture testbench of pam_map_tb is
 
     constant tperiod_clk : time := 10 ns ;
     constant tpd         : time := 2 ns ;
@@ -50,7 +50,7 @@ architecture testbench of pa_mod_tb is
         tpd         => tpd
     ) ;
 
-    DUT : entity work.pa_mod
+    DUT : entity work.pam_map
         generic map (
             DATA_WIDTH  =>  DATA_WIDTH
         )
