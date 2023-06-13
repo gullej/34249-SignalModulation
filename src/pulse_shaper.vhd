@@ -59,7 +59,7 @@ BEGIN
 --        + h_5 * (x[n-11] + x[n-21]) + h_4 * (x[n-12] + x[n-20]) + h_3 * (x[n-13] + x[n-19]) + h_2 * (x[n-14] + x[n-18]) + h_1 * (x[n-15] + x[n-17]) + h_0 * x[n-16]
 
     tx_dat_o <= std_logic_vector(
-                coeff_h16    * (shift_reg_x(0)  + shift_reg_x(32)) 
+                coeff_h16   * (shift_reg_x(0)  + shift_reg_x(32)) 
                 + coeff_h15 * (shift_reg_x(1)  + shift_reg_x(31)) 
                 + coeff_h14 * (shift_reg_x(1)  + shift_reg_x(30)) 
                 + coeff_h13 * (shift_reg_x(3)  + shift_reg_x(29)) 
@@ -75,7 +75,7 @@ BEGIN
                 + coeff_h3  * (shift_reg_x(13) + shift_reg_x(19)) 
                 + coeff_h2  * (shift_reg_x(14) + shift_reg_x(18)) 
                 + coeff_h1  * (shift_reg_x(15) + shift_reg_x(17)) 
-                + coeff_h0  * shift_reg_x(16) );
+                + coeff_h0  *  shift_reg_x(16) );
 
     SR : PROCESS(clk)
     BEGIN
