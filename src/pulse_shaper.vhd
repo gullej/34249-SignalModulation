@@ -9,13 +9,14 @@ ENTITY pulse_shaper IS
         rst      : IN  STD_LOGIC;
         clk      : IN  STD_LOGIC;
         --
-        rx_dat_i : IN  STD_LOGIC_VECTOR(8 * DATA_WIDTH - 1 DOWNTO 0);
+        rx_dat   : IN  STD_LOGIC_VECTOR(8 * DATA_WIDTH - 1 DOWNTO 0);
         -- { x[n-7] x[n-6] x[n-5] x[n-4] x[n-3] x[n-2] x[n-1] x[n] } 
-        rx_val_i : IN  STD_LOGIC;
+        rx_empty : IN  STD_LOGIC;
         --
-        tx_dat_o : OUT STD_LOGIC_VECTOR(13 DOWNTO 0);
+        tx_dat   : OUT STD_LOGIC_VECTOR(13 DOWNTO 0);
         -- y[n]
-        tx_val_o : OUT STD_LOGIC
+        tx_read  : OUT STD_LOGIC;
+        tx_val   : OUT STD_LOGIC
     );
 END pulse_shaper;
 
@@ -58,7 +59,9 @@ BEGIN
 --        + h_11 * (x[n-5] + x[n-27]) + h_10 * (x[n-6] + x[n-26]) + h_9 * (x[n-7] + x[n-25]) h_8 * (x[n-8] + x[n-24]) + h_7 * (x[n-9] + x[n-23]) + h_6 * (x[n-10] + x[n-22])
 --        + h_5 * (x[n-11] + x[n-21]) + h_4 * (x[n-12] + x[n-20]) + h_3 * (x[n-13] + x[n-19]) + h_2 * (x[n-14] + x[n-18]) + h_1 * (x[n-15] + x[n-17]) + h_0 * x[n-16]
 
-    tx_dat_o <= std_logic_vector(
+    tx_val <= '1';
+
+    tx_dat <= std_logic_vector(
                 coeff_h16   * (shift_reg_x(0)  + shift_reg_x(32)) 
                 + coeff_h15 * (shift_reg_x(1)  + shift_reg_x(31)) 
                 + coeff_h14 * (shift_reg_x(1)  + shift_reg_x(30)) 
@@ -80,6 +83,13 @@ BEGIN
     SR : PROCESS(clk)
     BEGIN
         IF (RISING_EDGE(clk)) THEN
+            tx_read <= '0';
+            shift_reg_i(0) <= (others => '0');
+
+            IF (ctrl(7) = '1' and rx_empty = '0') THEN
+                tx_read <= '1';
+            END IF;
+
             ctrl <= ctrl(6 downto 0) & ctrl(7);
 
             shift_reg_x(1 to 40) <= shift_reg_x(0 to 39);
@@ -92,16 +102,16 @@ BEGIN
             shift_reg_i(3) <= shift_reg_i(2);
             shift_reg_i(2) <= shift_reg_i(1);
             shift_reg_i(1) <= shift_reg_i(0);
-            
+
             IF (ctrl(0) = '1') THEN
-                shift_reg_i(7) <= signed(rx_dat_i(8 * DATA_WIDTH - 1 DOWNTO 7 * DATA_WIDTH));
-                shift_reg_i(6) <= signed(rx_dat_i(7 * DATA_WIDTH - 1 DOWNTO 6 * DATA_WIDTH));
-                shift_reg_i(5) <= signed(rx_dat_i(6 * DATA_WIDTH - 1 DOWNTO 5 * DATA_WIDTH));
-                shift_reg_i(4) <= signed(rx_dat_i(5 * DATA_WIDTH - 1 DOWNTO 4 * DATA_WIDTH));
-                shift_reg_i(3) <= signed(rx_dat_i(4 * DATA_WIDTH - 1 DOWNTO 3 * DATA_WIDTH));
-                shift_reg_i(2) <= signed(rx_dat_i(3 * DATA_WIDTH - 1 DOWNTO 2 * DATA_WIDTH));
-                shift_reg_i(1) <= signed(rx_dat_i(2 * DATA_WIDTH - 1 DOWNTO 1 * DATA_WIDTH));
-                shift_reg_i(0) <= signed(rx_dat_i(1 * DATA_WIDTH - 1 DOWNTO 0 * DATA_WIDTH));
+                shift_reg_i(7) <= signed(rx_dat(8 * DATA_WIDTH - 1 DOWNTO 7 * DATA_WIDTH));
+                shift_reg_i(6) <= signed(rx_dat(7 * DATA_WIDTH - 1 DOWNTO 6 * DATA_WIDTH));
+                shift_reg_i(5) <= signed(rx_dat(6 * DATA_WIDTH - 1 DOWNTO 5 * DATA_WIDTH));
+                shift_reg_i(4) <= signed(rx_dat(5 * DATA_WIDTH - 1 DOWNTO 4 * DATA_WIDTH));
+                shift_reg_i(3) <= signed(rx_dat(4 * DATA_WIDTH - 1 DOWNTO 3 * DATA_WIDTH));
+                shift_reg_i(2) <= signed(rx_dat(3 * DATA_WIDTH - 1 DOWNTO 2 * DATA_WIDTH));
+                shift_reg_i(1) <= signed(rx_dat(2 * DATA_WIDTH - 1 DOWNTO 1 * DATA_WIDTH));
+                shift_reg_i(0) <= signed(rx_dat(1 * DATA_WIDTH - 1 DOWNTO 0 * DATA_WIDTH));
             END IF;
 
             IF rst = '1' then
