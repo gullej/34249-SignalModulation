@@ -59,23 +59,23 @@ BEGIN
 --        + h_5 * (x[n-11] + x[n-21]) + h_4 * (x[n-12] + x[n-20]) + h_3 * (x[n-13] + x[n-19]) + h_2 * (x[n-14] + x[n-18]) + h_1 * (x[n-15] + x[n-17]) + h_0 * x[n-16]
 
     tx_dat_o <= std_logic_vector(
-                coeff_h0    * (resize(shift_reg_x(0) , 4) + resize(shift_reg_x(32), 4)) 
-                + coeff_h15 * (resize(shift_reg_x(1) , 4) + resize(shift_reg_x(31), 4)) 
-                + coeff_h14 * (resize(shift_reg_x(1) , 4) + resize(shift_reg_x(30), 4)) 
-                + coeff_h13 * (resize(shift_reg_x(3) , 4) + resize(shift_reg_x(29), 4)) 
-                + coeff_h12 * (resize(shift_reg_x(4) , 4) + resize(shift_reg_x(28), 4))
-                + coeff_h11 * (resize(shift_reg_x(5) , 4) + resize(shift_reg_x(27), 4)) 
-                + coeff_h10 * (resize(shift_reg_x(6) , 4) + resize(shift_reg_x(26), 4)) 
-                + coeff_h9  * (resize(shift_reg_x(7) , 4) + resize(shift_reg_x(25), 4)) 
-                + coeff_h7  * (resize(shift_reg_x(9) , 4) + resize(shift_reg_x(23), 4)) 
-                + coeff_h8  * (resize(shift_reg_x(8) , 4) + resize(shift_reg_x(24), 4))
-                + coeff_h6  * (resize(shift_reg_x(10), 4) + resize(shift_reg_x(22), 4))
-                + coeff_h5  * (resize(shift_reg_x(11), 4) + resize(shift_reg_x(21), 4)) 
-                + coeff_h4  * (resize(shift_reg_x(12), 4) + resize(shift_reg_x(20), 4)) 
-                + coeff_h3  * (resize(shift_reg_x(13), 4) + resize(shift_reg_x(19), 4)) 
-                + coeff_h2  * (resize(shift_reg_x(14), 4) + resize(shift_reg_x(18), 4)) 
-                + coeff_h1  * (resize(shift_reg_x(15), 4) + resize(shift_reg_x(17), 4)) 
-                + coeff_h0  * resize(shift_reg_x(16), 4) );
+                coeff_h16    * (shift_reg_x(0)  + shift_reg_x(32)) 
+                + coeff_h15 * (shift_reg_x(1)  + shift_reg_x(31)) 
+                + coeff_h14 * (shift_reg_x(1)  + shift_reg_x(30)) 
+                + coeff_h13 * (shift_reg_x(3)  + shift_reg_x(29)) 
+                + coeff_h12 * (shift_reg_x(4)  + shift_reg_x(28))
+                + coeff_h11 * (shift_reg_x(5)  + shift_reg_x(27)) 
+                + coeff_h10 * (shift_reg_x(6)  + shift_reg_x(26)) 
+                + coeff_h9  * (shift_reg_x(7)  + shift_reg_x(25)) 
+                + coeff_h7  * (shift_reg_x(9)  + shift_reg_x(23)) 
+                + coeff_h8  * (shift_reg_x(8)  + shift_reg_x(24))
+                + coeff_h6  * (shift_reg_x(10) + shift_reg_x(22))
+                + coeff_h5  * (shift_reg_x(11) + shift_reg_x(21)) 
+                + coeff_h4  * (shift_reg_x(12) + shift_reg_x(20)) 
+                + coeff_h3  * (shift_reg_x(13) + shift_reg_x(19)) 
+                + coeff_h2  * (shift_reg_x(14) + shift_reg_x(18)) 
+                + coeff_h1  * (shift_reg_x(15) + shift_reg_x(17)) 
+                + coeff_h0  * shift_reg_x(16) );
 
     SR : PROCESS(clk)
     BEGIN
@@ -83,7 +83,7 @@ BEGIN
             ctrl <= ctrl(6 downto 0) & ctrl(7);
 
             shift_reg_x(1 to 40) <= shift_reg_x(0 to 39);
-            shift_reg_x(0) <= shift_reg_i(7);
+            shift_reg_x(0) <= resize(shift_reg_i(7), 4);
 
             shift_reg_i(7) <= shift_reg_i(6);
             shift_reg_i(6) <= shift_reg_i(5);
