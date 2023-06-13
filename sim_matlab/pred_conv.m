@@ -1,3 +1,6 @@
+close all; clc; clearvars;
+rng(42)
+
 m = 8;
 taps = cos_pulse(1,m,4,0.2);
 
@@ -24,7 +27,7 @@ v = reshape([signal; zeros(m - 1, N)], 1, N * m);
 % pulse shaping
 vv = conv(v, taps_norm_fi);
 % fixed point
-vv = vv(cut+1:end-cut);
+%vv = vv(cut+1:end-cut);
 vvv = fi(vv, 1, A, b_norm-1);
 % binary
 vvvv = bin(vvv')  - '0';
