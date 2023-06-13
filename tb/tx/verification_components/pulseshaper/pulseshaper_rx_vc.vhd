@@ -30,7 +30,9 @@ entity pulseshaper_rx_vc is
         rx_valid        :  in  std_logic;
         rx_data         :  in  std_logic_vector(13 DOWNTO 0);
 
-        tx_valid        :  out std_logic;
+        rx_read         :  in  std_logic;
+
+        tx_empty        :  out std_logic;
         tx_data         :  out std_logic_vector(8 * DATA_WIDTH - 1 DOWNTO 0);
 
         -- Input Transactio interface
@@ -121,7 +123,7 @@ begin
       rdy  =>  tx_trans_rec.Rdy,
       ack  =>  tx_trans_rec.Ack
     );
-
+    tx_empty  <=  '1';
     case Operation is
        -- Execute Standard Directive Transactions
       when WAIT_FOR_TRANSACTION =>
@@ -134,10 +136,15 @@ begin
         tx_trans_rec.IntFromModel <= integer(ModelID);
 
       when SEND =>
-        tx_valid  <=  '1';
-        tx_data   <=  SafeResize(tx_trans_rec.DataToModel, tx_data'length);
-
-        WaitForClock(clk);
+        tx_empty  <=  '0';
+        if rx_read = '1' then
+          tx_trans_rec.BoolFromModel  <=  TRUE;
+          WaitForClock(clk);
+          tx_data   <=  SafeResize(tx_trans_rec.DataToModel, tx_data'length);
+        else
+          tx_trans_rec.BoolFromModel  <=  FALSE;
+          WaitForClock(clk);
+        end if;
 
       when others => 
         Alert(ModelID, "Unimplemented Transaction: " & to_string(Operation), FAILURE);

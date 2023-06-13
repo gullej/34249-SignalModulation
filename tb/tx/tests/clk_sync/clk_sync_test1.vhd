@@ -32,6 +32,8 @@ architecture clk_sync_test1 of test_ctrl_e is
             Cov  <= NewID("Clk_sync_Cov");
     
             wait for 0 ns ;  wait for 0 ns;
+            TranscriptOpen("ClkSync_Test1.txt") ;
+            SetTranscriptMirror(TRUE);
 
             AddBins(Cov, GenBin(2097152, 2097152));
             AddBins(Cov, GenBin(6291456, 6291456));
@@ -44,9 +46,11 @@ architecture clk_sync_test1 of test_ctrl_e is
     
             WaitForBarrier(TestDone, 35 ms);
             AlertIf(now >= 35 ms, "Test finished due to timeout");
-    
-            EndOfTestReports;
+
+            TranscriptClose;
+
             WriteBin(Cov);
+            EndOfTestReports;
             std.env.stop(GetAlertCount);
             wait;
         end process;

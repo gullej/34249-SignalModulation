@@ -86,7 +86,7 @@ BEGIN
             tx_read <= '0';
             shift_reg_i(0) <= (others => '0');
 
-            IF (ctrl(7) = '1' and rx_empty = '0') THEN
+            IF (ctrl(6) = '1' and rx_empty = '0') THEN
                 tx_read <= '1';
             END IF;
 
@@ -103,7 +103,7 @@ BEGIN
             shift_reg_i(2) <= shift_reg_i(1);
             shift_reg_i(1) <= shift_reg_i(0);
 
-            IF (ctrl(0) = '1') THEN
+            IF (ctrl(0) = '1' and rx_empty = '0') THEN
                 shift_reg_i(7) <= signed(rx_dat(8 * DATA_WIDTH - 1 DOWNTO 7 * DATA_WIDTH));
                 shift_reg_i(6) <= signed(rx_dat(7 * DATA_WIDTH - 1 DOWNTO 6 * DATA_WIDTH));
                 shift_reg_i(5) <= signed(rx_dat(6 * DATA_WIDTH - 1 DOWNTO 5 * DATA_WIDTH));
@@ -116,6 +116,8 @@ BEGIN
 
             IF rst = '1' then
                 ctrl  <=  (7 DOWNTO 1 => '0') & '1';
+                shift_reg_i  <=  (others => (others => '0'));
+                shift_reg_x  <=  (others => (others => '0'));
             end if;     
         END IF;
     END PROCESS SR;

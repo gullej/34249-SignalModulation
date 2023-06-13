@@ -63,7 +63,7 @@ architecture pulseshaper_test1 of test_ctrl_e is
             GenId := NewID("Manager", TbID);
     
             while (not(IsCovered(Cov))) loop
-                data_generator  :=  rnd.RandSlv(2);
+                data_generator  :=  to_slv(GetRandPoint(Cov),data_generator'length);
                 data0           :=  data_generator(0 DOWNTO 0);
                 data1           :=  data_generator(1 DOWNTO 1);
                 gray_data       :=  Graycode(data_generator); 

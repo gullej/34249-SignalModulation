@@ -79,13 +79,14 @@ architecture testbench of TLM_tb is
       stream_rx_rec  :  inout StreamRecType;
       sync_tx_rec    :  inout StreamRecType;
       sync_rx_rec    :  inout StreamRecType;
-      pulse_rx_rec   :  inout StreamRecType
+      pulse_rx_rec   :  inout StreamRecType;
+      pulse_tx_rec   :  inout StreamRecType
   
     );
   end component; 
 
   begin
-    read_fifo  <=  not empty_fifo;
+    --read_fifo  <=  not empty_fifo;
 
     --dbg <= <<signal .TLM_tb.TestCtrl_1.dbg : std_logic>>;
     -- create Clock
@@ -174,8 +175,9 @@ architecture testbench of TLM_tb is
         rst             =>  rst,
         rx_valid        =>  pulse_shaper_valid_out,
         rx_data         =>  pulse_shaper_data_out,
-        tx_valid        =>  open,
-        tx_data         =>  open,
+        rx_read         =>  read_fifo,
+        tx_empty        =>  pulse_shaper_valid_in,
+        tx_data         =>  open,--data_out_fifo,
         -- Input Transa
         rx_trans_rec    =>  pulse_rx_rec,
         -- Output Trans
@@ -192,7 +194,8 @@ architecture testbench of TLM_tb is
       stream_rx_rec  =>  stream_rx_rec,
       sync_tx_rec    =>  sync_tx_rec,
       sync_rx_rec    =>  sync_rx_rec,
-      pulse_rx_rec   =>  pulse_rx_rec
+      pulse_rx_rec   =>  pulse_rx_rec,
+      pulse_tx_rec   =>  pulse_tx_rec
     );
 
     GrayCode_COMP : entity work.pam_map
@@ -230,7 +233,7 @@ architecture testbench of TLM_tb is
 
     PulseShaper_Valid : process(clk_b)
     begin
-      pulse_shaper_valid_in  <=  read_fifo;
+      --pulse_shaper_valid_in  <=  read_fifo;
     end process PulseShaper_Valid;
 
     PulseShaper_COMP : entity work.pulse_shaper
@@ -241,12 +244,14 @@ architecture testbench of TLM_tb is
         rst       =>  rst,
         clk       =>  clk_b,
         --
-        rx_dat_i  =>  data_out_fifo,
+        rx_dat    =>  data_out_fifo,
         -- 
-        rx_val_i  =>  pulse_shaper_valid_in,
+        rx_empty  =>  empty_fifo,
         --
-        tx_dat_o  =>  pulse_shaper_data_out,
+        tx_dat    =>  pulse_shaper_data_out,
         -- 
-        tx_val_o  =>  pulse_shaper_valid_out
+        tx_read   =>  read_fifo,
+
+        tx_val    =>  pulse_shaper_valid_out
       );
 end testbench;
