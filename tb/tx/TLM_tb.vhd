@@ -177,7 +177,7 @@ architecture testbench of TLM_tb is
         rx_data         =>  pulse_shaper_data_out,
         rx_read         =>  read_fifo,
         tx_empty        =>  pulse_shaper_valid_in,
-        tx_data         =>  open,--data_out_fifo,
+        tx_data         =>  data_out_fifo,--data_out_fifo,
         -- Input Transa
         rx_trans_rec    =>  pulse_rx_rec,
         -- Output Trans
@@ -226,7 +226,7 @@ architecture testbench of TLM_tb is
             rx_rd    => read_fifo,
             rx_wr    => write_fifo,
             --
-            tx_dat   => data_out_fifo,
+            tx_dat   => open,
             tx_empty => empty_fifo,
             tx_full  => full_fifo
         );
@@ -246,7 +246,7 @@ architecture testbench of TLM_tb is
         --
         rx_dat    =>  data_out_fifo,
         -- 
-        rx_empty  =>  empty_fifo,
+        rx_empty  =>  pulse_shaper_valid_in,
         --
         tx_dat    =>  pulse_shaper_data_out,
         -- 
