@@ -28,7 +28,7 @@ v = reshape([signal; zeros(m - 1, N)], 1, N * m);
 vv = conv(v, taps_norm_fi);
 % fixed point
 vv = vv(cut+1:end-cut);
-vvv = fi(vv, 1, A, b_norm-1);
+vvv = fi(vv, 1, 14, 9);
 % binary
 vvvv = bin(vvv')  - '0';
 
@@ -67,8 +67,16 @@ print(h,'../Docs/PulseShaperDirectedTest_1_target','-dpdf','-r0')
 
 %%
 
-r = double(conv(vvv, mF * alpha));
+r = double(conv(vvv, double(fi(mF,1,13,12))));
 rr = r(cut+1:end-cut);
 rrr = rr(1:m:end)/m;
-ans = round(rrr);
-stem(ans)
+fsig = round(rrr*alpha);
+stem(fsig)
+
+%%
+
+steps = zeros(1,430);
+
+for i = 2:431
+    steps(i-1) = r(i+1) - r(i-1);
+end
