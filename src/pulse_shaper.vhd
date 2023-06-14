@@ -6,17 +6,17 @@ ENTITY pulse_shaper IS
     GENERIC (
         DATA_WIDTH : INTEGER);
     PORT (
-        rst      : IN  STD_LOGIC;
-        clk      : IN  STD_LOGIC;
+        rst         : IN  STD_LOGIC;
+        clk         : IN  STD_LOGIC;
         --
-        rx_dat   : IN  STD_LOGIC_VECTOR(8 * DATA_WIDTH - 1 DOWNTO 0);
+        rx_dat      : IN  STD_LOGIC_VECTOR(8 * DATA_WIDTH - 1 DOWNTO 0);
         -- { x[n-7] x[n-6] x[n-5] x[n-4] x[n-3] x[n-2] x[n-1] x[n] } 
-        rx_empty : IN  STD_LOGIC;
+        rx_empty    : IN  STD_LOGIC;
         --
-        tx_dat   : OUT STD_LOGIC_VECTOR(13 DOWNTO 0);
+        tx_dat      : OUT STD_LOGIC_VECTOR(13 DOWNTO 0);
         -- y[n]
-        tx_read  : OUT STD_LOGIC;
-        tx_val   : OUT STD_LOGIC
+        tx_read     : OUT STD_LOGIC;
+        tx_val      : OUT STD_LOGIC
     );
 END pulse_shaper;
 

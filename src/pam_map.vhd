@@ -1,21 +1,22 @@
 library ieee ;
   use ieee.std_logic_1164.all ;
   use ieee.numeric_std.all ;
-  use ieee.numeric_std_unsigned.all ;
+  use ieee.std_logic_unsigned.all;
 
 ENTITY pam_map IS
     GENERIC (
-        DATA_WIDTH : INTEGER);
+        DATA_WIDTH : INTEGER := 3
+    );
     PORT (
-        rst     :  IN  STD_LOGIC;
-        clk     :  IN  STD_LOGIC;
+        rst        :  IN  STD_LOGIC;
+        clk        :  IN  STD_LOGIC;
         --
-        rx_dat  :  IN  STD_LOGIC;
-        rx_val  :  IN  STD_LOGIC;
-        rx_full :  IN  STD_LOGIC;
+        rx_dat     :  IN  STD_LOGIC;
+        rx_val     :  IN  STD_LOGIC;
+        rx_full    :  IN  STD_LOGIC;
         --
-        tx_dat  :  OUT STD_LOGIC_VECTOR(DATA_WIDTH - 1 DOWNTO 0);
-        tx_wr   :  OUT STD_LOGIC
+        tx_dat     :  OUT STD_LOGIC_VECTOR(DATA_WIDTH - 1 DOWNTO 0);
+        tx_wr      :  OUT STD_LOGIC
     );
 END pam_map;
 

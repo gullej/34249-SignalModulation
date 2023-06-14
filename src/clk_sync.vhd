@@ -41,7 +41,7 @@ USE altera_mf.all;
 
 ENTITY clk_sync IS
 	GENERIC (
-		DATA_WIDTH : INTEGER);
+		DATA_WIDTH  : INTEGER);
 	PORT
 	(
 		clk_rd      :  IN  STD_LOGIC;
