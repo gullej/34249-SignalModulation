@@ -28,6 +28,8 @@ SIGNAL rd_en_reg1, rd_en_reg2, rd_en_reg3 : STD_LOGIC;
 
 BEGIN
 
+tx_val <= rd_en_reg3 when RISING_EDGE(clk_b);
+
 rd_en_reg1 <= rx_rd when RISING_EDGE(clk_a);
 rd_en_reg2 <= rd_en_reg1 when RISING_EDGE(clk_a);
 rd_en_reg3 <= rd_en_reg2 when RISING_EDGE(clk_b);
