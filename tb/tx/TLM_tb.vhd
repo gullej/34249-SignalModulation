@@ -23,6 +23,7 @@ architecture testbench of TLM_tb is
 
   constant tperiod_Clk   : time := 10 ns ;
   constant tperiod_Clk_b : time := 20 ns ;
+  constant tperiod_Clk_c : time := 160 ns ;
   constant tpd           : time := 2 ns ;
 
 -----------------------------------------------------------
@@ -31,6 +32,7 @@ architecture testbench of TLM_tb is
 
   signal clk    :  std_logic;
   signal clk_b  :  std_logic;
+  signal clk_c  :  std_logic;
   signal rst    :  std_logic;
 
   signal pam_map_data   :  std_logic_vector(0 DOWNTO 0);
@@ -52,6 +54,9 @@ architecture testbench of TLM_tb is
 
   signal clk_recovery_data_out   :  std_logic_vector(3 DOWNTO 0);
   signal clk_recovery_wr_out     :  std_logic;
+
+  signal downsample_data_out     :  std_logic_vector(27 DOWNTO 0);
+  signal downsample_val_out      :  std_logic;
 
   signal tranceiver_data   :  std_logic_vector(13 DOWNTO 0);
   signal tranceiver_valid  :  std_logic;
@@ -180,6 +185,12 @@ architecture testbench of TLM_tb is
     Osvvm.TbUtilPkg.CreateClock (
       Clk        => clk_b,
       Period     => tperiod_Clk_b
+    )  ;
+
+    -- create Clock
+    Osvvm.TbUtilPkg.CreateClock (
+      Clk        => clk_c,
+      Period     => tperiod_Clk_c
     )  ;
 
     -- create nReset
@@ -391,6 +402,29 @@ architecture testbench of TLM_tb is
         tx_dat      => clk_recovery_data_out,
         tx_wr       => clk_recovery_wr_out 
       );
+
+  ----------------------------------------------
+  --             Downsample DUT               --
+  ----------------------------------------------  
+
+    Downsample_DUT : entity work.downsample
+    generic map(
+      DATA_WIDTH  =>  DATA_WIDTH
+    )
+    PORT MAP (
+      rst         =>  rst,
+      clk_wr      => clk_b,
+      clk_rd      => clk_c,
+      --
+      rx_dat      => match_filter_data_out,
+      rx_wr       => match_filter_valid_out,
+      --
+      rx_addr     => clk_recovery_data_out,
+      rx_rd       => clk_recovery_wr_out,
+      --
+      tx_dat      => downsample_data_out,
+      tx_val      => downsample_val_out
+    );
 
 -----------------------------------------------------------
 --                     TLM Top DUT                       --

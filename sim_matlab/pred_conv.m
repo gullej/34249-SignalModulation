@@ -34,49 +34,67 @@ vvvv = bin(vvv')  - '0';
 
 %%
 
-args = dec2bin(signal, 8) - '0';
-args = args(:,end-2:end);
-
-fileID = fopen('in.txt','w');
-fprintf(fileID,'%d%d%d000000000000000000000\n',args');
-
-fclose(fileID);
-
-fileID = fopen('out.txt', 'w');
-fprintf(fileID,'%d%d%d%d%d%d%d%d%d%d%d%d%d%d\n',vvvv');
-
-fclose(fileID);
-
-h = figure;
-
-plot(vvv)
-
-grid on
-ylim([-.5 0.5])
-xlim([0 432])
-
-legend('PAM4', 'Location','southwest')
-ylabel('Amplitude')
-xlabel('Sample Number','FontSize',11,'FontWeight','bold')
-title('Filtered Signal','FontSize',14,'FontWeight','bold')
-
-set(h,'Units','Inches');
-pos = get(h,'Position');
-set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-print(h,'../Docs/PulseShaperDirectedTest_1_target','-dpdf','-r0')
+% args = dec2bin(signal, 8) - '0';
+% args = args(:,end-2:end);
+% 
+% fileID = fopen('in.txt','w');
+% fprintf(fileID,'%d%d%d000000000000000000000\n',args');
+% 
+% fclose(fileID);
+% 
+% fileID = fopen('out.txt', 'w');
+% fprintf(fileID,'%d%d%d%d%d%d%d%d%d%d%d%d%d%d\n',vvvv');
+% 
+% fclose(fileID);
+% 
+% h = figure;
+% 
+% plot(vvv)
+% 
+% grid on
+% ylim([-.5 0.5])
+% xlim([0 432])
+% 
+% legend('PAM4', 'Location','southwest')
+% ylabel('Amplitude')
+% xlabel('Sample Number','FontSize',11,'FontWeight','bold')
+% title('Filtered Signal','FontSize',14,'FontWeight','bold')
+% 
+% set(h,'Units','Inches');
+% pos = get(h,'Position');
+% set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+% print(h,'../Docs/PulseShaperDirectedTest_1_target','-dpdf','-r0')
 
 %%
 
 r = double(conv(vvv, double(fi(mF,1,13,12))));
 rr = r(cut+1:end-cut);
-rrr = rr(1:m:end)/m;
-fsig = round(rrr*alpha);
-stem(fsig)
+rrr = rr(1:m:end);
+fsig = round(rrr/m*alpha);
+fsig ~= signal
 
 %%
 
-steps = zeros(1,430);
+sample = repmat([1 0 0 0 0 0 0 0 ], 1, size(rr,2)/8);
+stem(sample)
+hold on
+plot(rr, '-gsq')
 
-for i = 2:431
-    steps(i-1) = r(i+1) - r(i-1);
+steps = zeros(1,size(rr,2)+2);
+r_0 = [0 rr 0];
+
+for i = 2:size(rr,2)+1
+    steps(i-1) = r_0(i+1) - r_0(i-1);
+end
+
+plot(steps, '-bx')
+xlim([cut size(rr,2)-cut])
+
+close all;
+
+hold on
+for i = 1:7
+    plot(steps(i:m:end))
+    mean(steps(i:m:end))
+    
 end

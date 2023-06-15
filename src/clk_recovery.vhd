@@ -23,6 +23,9 @@ ARCHITECTURE clk_recovery_arc OF clk_recovery IS
     TYPE sr_type IS ARRAY (0 TO 2) OF signed(27 DOWNTO 0);
     SIGNAL shift_reg : sr_type;
 
+    CONSTANT delta_pos : SIGNED(27 DOWNTO 0) := "0000000000000000100000110001";
+    CONSTANT delta_neg : SIGNED(27 DOWNTO 0) := "1111111111111111011111001111";
+
     SIGNAL wr_cnt    : STD_LOGIC_VECTOR(7 DOWNTO 0);
     SIGNAL wr_addr   : STD_LOGIC_VECTOR(3 DOWNTO 0);
 
@@ -38,7 +41,6 @@ BEGIN
 tx_dat    <= wr_addr;
 
 calc_diff <= abs(shift_reg(2)) - abs(shift_reg(0));
-calc_sum  <= calc_sum + calc_diff;
 calc_avg  <= resize(calc_sum(2095 DOWNTO 12), 2096);
 
 SR : PROCESS(clk)
@@ -61,13 +63,14 @@ BEGIN
 
             IF(wr_cnt(7) = '1') THEN
                 wr_addr <= wr_addr + 8;
+                calc_sum  <= calc_sum + calc_diff;
             END IF;            
 
             IF (to_integer(unsigned(calc_cnt)) = 2048) THEN
-                IF (calc_avg > 0) THEN
-                    wr_addr <= wr_addr + 7;
-                ELSIF (calc_avg < 0) THEN
+                IF (calc_avg > delta_pos) THEN
                     wr_addr <= wr_addr + 9;
+                ELSIF (calc_avg < delta_neg) THEN
+                    wr_addr <= wr_addr + 7;
                 END IF;
                 calc_cnt <= (others => '0');
                 calc_sum <= (others => '0');
