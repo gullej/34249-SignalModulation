@@ -92,15 +92,33 @@ architecture testbench of TLM_tb is
     ParamFromModel(16 downto 0)
   );
 
-  -- Gray Code Tx signals
+  -- Gray Code Tx VC signals
   signal tx_gray_code_vc_valid  :  std_logic;
   signal tx_gray_code_vc_last   :  std_logic; 
   signal tx_gray_code_vc_data   :  std_logic_vector(0 DOWNTO 0);
 
-  -- Gray Code Rx signals
+  -- Gray Code Rx VC signals
   signal rx_gray_code_vc_write  :  std_logic;
   signal rx_gray_code_vc_data   :  std_logic_vector(DATA_WIDTH - 1 DOWNTO 0);
 
+  -- Clock Synchroniser Rx VC signals
+  --Input signals
+  signal rx_clk_sync_vc_dat_in     :  std_logic_vector(DATA_WIDTH - 1 DOWNTO 0);
+  signal rx_clk_sync_vc_rd_in      :  std_logic;
+  signal rx_clk_sync_vc_wr_in      :  std_logic;
+  --Output signals
+  signal rx_clk_sync_vc_dat_out	   :  std_logic_vector(8 * DATA_WIDTH - 1 DOWNTO 0);
+  signal rx_clk_sync_vc_empty_out  :  std_logic;
+  signal rx_clk_sync_vc_full_out   :  std_logic;
+
+  -- Pulse Shaper VC signals
+  --Receive signals 
+  signal rx_pulse_shaper_vc_valid  :  std_logic;
+  signal rx_pulse_shaper_vc_data   :  std_logic_vector(13 DOWNTO 0);
+  signal rx_pulse_shaper_vc_read   :  std_logic;
+  --Transmsit signals
+  signal tx_pulse_shaper_vc_empty  :  std_logic;
+  signal tx_pulse_shaper_vc_data   :  std_logic_vector(8 * DATA_WIDTH - 1 DOWNTO 0);
 -----------------------------------------------------------
 --        Test Controller DUTonents Declaration          --
 --vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv--
@@ -119,6 +137,34 @@ architecture testbench of TLM_tb is
   end component; 
 
   begin
+
+    -- Mapping of Gray Code Tx VC
+    tx_gray_code_vc_valid  <=  pam_map_valid;
+    tx_gray_code_vc_last   <=  'X';
+    tx_gray_code_vc_data   <=  pam_map_data;
+    
+    -- Mapping of Gray Code Rx VC
+    rx_gray_code_vc_write  <=  clk_sync_write;
+    rx_gray_code_vc_data   <=  clk_sync_data_in;
+    
+    -- Mapping of Clock Synchroniser RX VC
+    --Input signals
+    rx_clk_sync_vc_dat_in     <=  clk_sync_data_in;
+    rx_clk_sync_vc_rd_in      <=  clk_sync_read;
+    rx_clk_sync_vc_wr_in      <=  clk_sync_write;
+    --Output signals
+    rx_clk_sync_vc_dat_out	  <=  clk_sync_data_out;
+    rx_clk_sync_vc_empty_out  <=  clk_sync_empty;
+    rx_clk_sync_vc_full_out   <=  clk_sync_full;
+
+
+    rx_pulse_shaper_vc_valid  <=  pulse_shaper_valid_out;
+    rx_pulse_shaper_vc_data   <=  pulse_shaper_data_out;
+    rx_pulse_shaper_vc_read   <=  clk_sync_read;
+
+    tx_pulse_shaper_vc_empty  <=  pulse_shaper_valid_in;
+    tx_pulse_shaper_vc_data   <=  clk_sync_data_out;
+
     --dbg <= <<signal .TLM_tb.TestCtrl_1.dbg : std_logic>>;
 -----------------------------------------------------------
 --            OSVVM Clock and Reset Creation             --
@@ -159,9 +205,9 @@ architecture testbench of TLM_tb is
       port map (
         clk         =>  clk,
         rst         =>  rst,
-        tx_valid    =>  pam_map_valid,
-        tx_last     =>  open,
-        tx_data     =>  pam_map_data,
+        tx_valid    =>  tx_gray_code_vc_valid,
+        tx_last     =>  tx_gray_code_vc_last,
+        tx_data     =>  tx_gray_code_vc_data,
         --Transactio interface
         trans_rec   =>  stream_tx_rec
       );
@@ -176,8 +222,8 @@ architecture testbench of TLM_tb is
       port map (
         clk         =>  clk,
         rst         =>  rst,
-        rx_write    =>  clk_sync_write,
-        rx_data     =>  clk_sync_data_in,
+        rx_write    =>  rx_gray_code_vc_write,
+        rx_data     =>  rx_gray_code_vc_data,
         --Transactio interface
         trans_rec   =>  stream_rx_rec
       );
@@ -194,13 +240,13 @@ architecture testbench of TLM_tb is
       clk_wr            =>  clk,
       rst               =>  rst,
 
-      rx_dat_in         =>  clk_sync_data_in,
-      rx_rd_in          =>  clk_sync_read,
-      rx_wr_in          =>  clk_sync_write,
-      --
-      rx_dat_out	      =>  clk_sync_data_out,
-      rx_empty_out      =>  clk_sync_empty,
-      rx_full_out       =>  clk_sync_full,
+      rx_dat_in         =>  rx_clk_sync_vc_dat_in,
+      rx_rd_in          =>  rx_clk_sync_vc_rd_in,
+      rx_wr_in          =>  rx_clk_sync_vc_wr_in,
+      
+      rx_dat_out	      =>  rx_clk_sync_vc_dat_out,
+      rx_empty_out      =>  rx_clk_sync_vc_empty_out,
+      rx_full_out       =>  rx_clk_sync_vc_full_out,
 
       --Transaction interface
       rx_trans_rec_in   =>  sync_tx_rec,
@@ -217,11 +263,11 @@ architecture testbench of TLM_tb is
       port map (
         clk           =>  clk_b,
         rst           =>  rst,
-        rx_valid      =>  pulse_shaper_valid_out,
-        rx_data       =>  pulse_shaper_data_out,
-        rx_read       =>  clk_sync_read,
-        tx_empty      =>  pulse_shaper_valid_in,
-        tx_data       =>  clk_sync_data_out,
+        rx_valid      =>  rx_pulse_shaper_vc_valid,
+        rx_data       =>  rx_pulse_shaper_vc_data,
+        rx_read       =>  rx_pulse_shaper_vc_read,
+        tx_empty      =>  tx_pulse_shaper_vc_empty,
+        tx_data       =>  tx_pulse_shaper_vc_data,
         -- Transaction interfaces
         rx_trans_rec  =>  pulse_rx_rec,
         tx_trans_rec  =>  pulse_tx_rec
