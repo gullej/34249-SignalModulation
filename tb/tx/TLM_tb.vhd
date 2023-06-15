@@ -47,6 +47,7 @@ architecture testbench of TLM_tb is
 
   signal pulse_shaper_valid_in   :  std_logic;
   signal pulse_shaper_valid_out  :  std_logic;
+  signal pulse_shaper_data_in    :  std_logic_vector(8 * DATA_WIDTH - 1 DOWNTO 0);
   signal pulse_shaper_data_out   :  std_logic_vector(13 DOWNTO 0);
 
   signal match_filter_data_out   :  std_logic_vector(27 DOWNTO 0);
@@ -93,8 +94,8 @@ architecture testbench of TLM_tb is
   signal  pulse_tx_rec, pulse_rx_rec : StreamRecType (
     DataToModel(8 * DATA_WIDTH - 1 DOWNTO 0),
     DataFromModel(13 DOWNTO 0),
-    ParamToModel  (16 downto 0),
-    ParamFromModel(16 downto 0)
+    ParamToModel  (15 downto 0),
+    ParamFromModel(15 downto 0)
   );
 
   -- Gray Code Tx VC signals
@@ -144,9 +145,8 @@ architecture testbench of TLM_tb is
   begin
 
     -- Mapping of Gray Code Tx VC
-    tx_gray_code_vc_valid  <=  pam_map_valid;
-    tx_gray_code_vc_last   <=  'X';
-    tx_gray_code_vc_data   <=  pam_map_data;
+    pam_map_valid  <=  tx_gray_code_vc_valid;
+    pam_map_data   <=  tx_gray_code_vc_data;
     
     -- Mapping of Gray Code Rx VC
     rx_gray_code_vc_write  <=  clk_sync_write;
@@ -167,8 +167,9 @@ architecture testbench of TLM_tb is
     rx_pulse_shaper_vc_data   <=  pulse_shaper_data_out;
     rx_pulse_shaper_vc_read   <=  clk_sync_read;
 
-    tx_pulse_shaper_vc_empty  <=  pulse_shaper_valid_in;
-    tx_pulse_shaper_vc_data   <=  clk_sync_data_out;
+    pulse_shaper_valid_in  <=  tx_pulse_shaper_vc_empty;
+    pulse_shaper_data_in   <=  tx_pulse_shaper_vc_data when (pulse_tx_rec.ParamFromModel = x"0001") else
+                              clk_sync_data_out;
 
     --dbg <= <<signal .TLM_tb.TestCtrl_1.dbg : std_logic>>;
 -----------------------------------------------------------
@@ -340,7 +341,7 @@ architecture testbench of TLM_tb is
         rx_rd         =>  clk_sync_read,
         rx_wr         =>  clk_sync_write,
       
-        tx_dat        =>  open,
+        tx_dat        =>  clk_sync_data_out,
         tx_empty      =>  clk_sync_empty,
         tx_full       =>  clk_sync_full
         );
@@ -356,8 +357,8 @@ architecture testbench of TLM_tb is
         rst         =>  rst,
         clk         =>  clk_b,
         --
-        rx_dat      =>  clk_sync_data_out, 
-        rx_empty    =>  pulse_shaper_valid_in,
+        rx_dat      =>  pulse_shaper_data_in,
+        rx_empty    =>  clk_sync_empty,
         --
         tx_dat      =>  pulse_shaper_data_out,
         tx_read     =>  clk_sync_read,
@@ -400,7 +401,7 @@ architecture testbench of TLM_tb is
         rx_val      => match_filter_valid_out,
         --
         tx_dat      => clk_recovery_data_out,
-        tx_wr       => clk_recovery_wr_out 
+        tx_wr       => clk_recovery_wr_out
       );
 
   ----------------------------------------------

@@ -73,6 +73,8 @@ architecture pulseshaper_directed_test1 of test_ctrl_e is
             Cov  <= NewID("PulseShaper_directed_Cov");
     
             wait for 0 ns ;  wait for 0 ns;
+
+            pulse_tx_rec.ParamFromModel <=  SafeResize(x"0001",pulse_tx_rec.ParamFromModel'length);
     
             AddBins(Cov, GenBin(0,16383));
 

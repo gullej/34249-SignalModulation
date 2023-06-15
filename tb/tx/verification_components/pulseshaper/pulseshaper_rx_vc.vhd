@@ -69,7 +69,6 @@ end process Initialize ;
 TransactionHandler_Input : process
 alias Operation : StreamOperationType is rx_trans_rec.Operation;
 begin
-
   wait for 0 ns;
 
   loop
