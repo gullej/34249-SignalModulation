@@ -167,9 +167,10 @@ architecture testbench of TLM_tb is
     rx_pulse_shaper_vc_data   <=  pulse_shaper_data_out;
     rx_pulse_shaper_vc_read   <=  clk_sync_read;
 
-    pulse_shaper_valid_in  <=  tx_pulse_shaper_vc_empty;
+    pulse_shaper_valid_in  <=  tx_pulse_shaper_vc_empty when (pulse_tx_rec.ParamFromModel = x"0001") else
+                               clk_sync_empty;
     pulse_shaper_data_in   <=  tx_pulse_shaper_vc_data when (pulse_tx_rec.ParamFromModel = x"0001") else
-                              clk_sync_data_out;
+                               clk_sync_data_out;
 
     --dbg <= <<signal .TLM_tb.TestCtrl_1.dbg : std_logic>>;
 -----------------------------------------------------------
@@ -358,7 +359,7 @@ architecture testbench of TLM_tb is
         clk         =>  clk_b,
         --
         rx_dat      =>  pulse_shaper_data_in,
-        rx_empty    =>  clk_sync_empty,
+        rx_empty    =>  pulse_shaper_valid_in,
         --
         tx_dat      =>  pulse_shaper_data_out,
         tx_read     =>  clk_sync_read,
