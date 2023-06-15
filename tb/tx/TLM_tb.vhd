@@ -47,6 +47,13 @@ architecture testbench of TLM_tb is
   signal pulse_shaper_valid_out  :  std_logic;
   signal pulse_shaper_data_out   :  std_logic_vector(13 DOWNTO 0);
 
+  signal match_filter_data_out   :  std_logic_vector(27 DOWNTO 0);
+  signal match_filter_valid_out  :  std_logic;
+
+  signal clk_recovery_data_out   :  std_logic_vector(27 DOWNTO 0);
+  signal clk_recovery_wr_out     :  std_logic;
+  signal clk_recovery_valid_out  :  std_logic;
+
   signal tranceiver_data   :  std_logic_vector(13 DOWNTO 0);
   signal tranceiver_valid  :  std_logic;
 
@@ -281,6 +288,52 @@ architecture testbench of TLM_tb is
         tx_read     =>  fifo_read,
         tx_val      =>  pulse_shaper_valid_out
       );
+
+    MatchFilter_DUT : entity work.match_filter
+      generic map(
+        DATA_WIDTH  =>  DATA_WIDTH
+      )
+      PORT MAP (
+        rst         =>  rst,
+        clk         =>  clk_b,
+        --
+        rx_dat      => pulse_shaper_data_out,
+        --
+        tx_dat      => match_filter_data_out,
+        tx_val      => match_filter_valid_out
+      );
+
+    ClockRecovery_DUT : entity work.clk_recovery
+      generic map (
+        DATA_WIDTH  =>  DATA_WIDTH
+      )
+      PORT MAP (
+        rst         =>  rst,
+        clk         =>  clk_b,
+        --
+        rx_dat      => match_filter_data_out,
+        rx_val      => match_filter_valid_out,
+        --
+        tx_dat      => clk_recovery_data_out,
+        tx_wr       => clk_recovery_wr_out,
+        tx_val      => clk_recovery_valid_out 
+      );
+   
+-- ENTITY clk_recovery IS
+-- GENERIC (
+--     DATA_WIDTH : INTEGER);
+-- PORT (
+--     rst      : IN  STD_LOGIC;
+--     clk      : IN  STD_LOGIC;
+--     --
+--     rx_dat   : IN  STD_LOGIC_VECTOR(27 DOWNTO 0);
+--     rx_val   : IN  STD_LOGIC;
+--     --
+--     tx_dat   : OUT STD_LOGIC_VECTOR(27 DOWNTO 0);
+--     tx_wr    : OUT STD_LOGIC;
+--     tx_val   : OUT STD_LOGIC
+-- );
+-- END clk_recovery;
 
 -----------------------------------------------------------
 --                     TLM Top DUT                       --

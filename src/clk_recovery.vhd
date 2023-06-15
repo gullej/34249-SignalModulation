@@ -36,6 +36,8 @@ ARCHITECTURE clk_recovery_arc OF clk_recovery IS
 
 BEGIN
 
+tx_dat    <= wr_addr;
+
 calc_diff <= abs(shift_reg(2)) - abs(shift_reg(0));
 calc_sum  <= calc_sum + calc_diff;
 calc_avg  <= resize(calc_sum(2095 DOWNTO 12), 2096);
@@ -50,7 +52,6 @@ BEGIN
         wr_addr  <= wr_addr;
 
         IF (rx_val = '1') THEN
-            tx_dat <= std_logic_vector(shift_reg(1));
             tx_wr <= '1';
 
             shift_reg(1 to 2) <= shift_reg(0 to 1);
@@ -77,6 +78,8 @@ BEGIN
                 shift_reg  <=  (others => (others => '0'));
                 calc_cnt <= (others => '0');
                 calc_sum <= (others => '0');
+                wr_cnt   <= (others => '0');
+                wr_addr  <= (others => '0');
             END IF;     
         END IF;
     END IF;
