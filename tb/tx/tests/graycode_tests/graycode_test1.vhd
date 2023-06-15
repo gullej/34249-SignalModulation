@@ -29,7 +29,10 @@ architecture graycode_test1 of test_ctrl_e is
             SB   <= NewID("Graycode_SB");
     
             wait for 0 ns ;  wait for 0 ns;
-    
+
+            stream_rx_rec.ParamFromModel <=  SafeResize(x"0002",stream_rx_rec.ParamFromModel'length);
+            stream_tx_rec.ParamFromModel <=  SafeResize(x"0002",stream_tx_rec.ParamFromModel'length);
+
             wait until rst = '0';
             ClearAlerts;
     

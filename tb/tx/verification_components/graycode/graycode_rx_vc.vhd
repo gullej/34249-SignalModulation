@@ -87,7 +87,6 @@ begin
             trans_rec.BoolFromModel  <=  FALSE;
         end if;
         trans_rec.DataFromModel  <=  SafeResize(rx_data,trans_rec.DataFromModel'length);
-
         WaitForClock(clk);
 
       when others => 

@@ -37,6 +37,7 @@ architecture testbench of TLM_tb is
 
   signal pam_map_data   :  std_logic_vector(0 DOWNTO 0);
   signal pam_map_valid  :  std_logic;
+  signal pam_map_full   :  std_logic;
 
   signal clk_sync_data_in   :  std_logic_vector(DATA_WIDTH-1 DOWNTO 0);
   signal clk_sync_data_out  :  std_logic_vector(DATA_WIDTH*8-1 DOWNTO 0);
@@ -70,24 +71,24 @@ architecture testbench of TLM_tb is
   signal stream_tx_rec, stream_rx_rec : StreamRecType (
     DataToModel(0 DOWNTO 0),
     DataFromModel(DATA_WIDTH - 1 DOWNTO 0),
-    ParamToModel  (16 downto 0),
-    ParamFromModel(16 downto 0)
+    ParamToModel  (15 downto 0),
+    ParamFromModel(15 downto 0)
   );
 
   -- Clock Synchroniser Transmitter interface
   signal  sync_tx_rec : StreamRecType (
     DataToModel(DATA_WIDTH - 1 DOWNTO 0),
     DataFromModel(DATA_WIDTH - 1 DOWNTO 0),
-    ParamToModel  (16 downto 0),
-    ParamFromModel(16 downto 0)
+    ParamToModel  (15 downto 0),
+    ParamFromModel(15 downto 0)
   );
 
   -- Clock Synchroniser Receiver interface
   signal  sync_rx_rec : StreamRecType (
     DataToModel(8 * DATA_WIDTH - 1 DOWNTO 0),
     DataFromModel(8 * DATA_WIDTH - 1 DOWNTO 0),
-    ParamToModel  (16 downto 0),
-    ParamFromModel(16 downto 0)
+    ParamToModel  (15 downto 0),
+    ParamFromModel(15 downto 0)
   );
 
   -- Pulse Shaper Tx/Rx interfaces
@@ -165,7 +166,13 @@ architecture testbench of TLM_tb is
 
     rx_pulse_shaper_vc_valid  <=  pulse_shaper_valid_out;
     rx_pulse_shaper_vc_data   <=  pulse_shaper_data_out;
+
+    
     rx_pulse_shaper_vc_read   <=  clk_sync_read;
+
+
+    pam_map_full  <=  '0' when (stream_tx_rec.ParamFromModel = x"0002") else
+                      clk_sync_full;
 
     pulse_shaper_valid_in  <=  tx_pulse_shaper_vc_empty when (pulse_tx_rec.ParamFromModel = x"0001") else
                                clk_sync_empty;
@@ -321,7 +328,7 @@ architecture testbench of TLM_tb is
         
         rx_dat  =>  pam_map_data(0),
         rx_val  =>  pam_map_valid,
-        rx_full =>  clk_sync_full,
+        rx_full =>  pam_map_full,
         
         tx_dat  =>  clk_sync_data_in,
         tx_wr   =>  clk_sync_write

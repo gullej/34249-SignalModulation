@@ -137,8 +137,8 @@ begin
         else
           rx_trans_rec_out.BoolFromModel  <=  FALSE;
         end if;
-        WaitForClock(clk_rd);
         rx_trans_rec_out.DataFromModel  <=  SafeResize(rx_dat_out,rx_trans_rec_out.DataFromModel'length);
+        WaitForClock(clk_rd);
 
 
       when others => 
