@@ -13,9 +13,8 @@ ENTITY clk_recovery IS
         rx_dat   : IN  STD_LOGIC_VECTOR(27 DOWNTO 0);
         rx_val   : IN  STD_LOGIC;
         --
-        tx_dat   : OUT STD_LOGIC_VECTOR(27 DOWNTO 0);
-        tx_wr    : OUT STD_LOGIC;
-        tx_val   : OUT STD_LOGIC
+        tx_dat   : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+        tx_wr    : OUT STD_LOGIC
     );
 END clk_recovery;
 
@@ -25,7 +24,7 @@ ARCHITECTURE clk_recovery_arc OF clk_recovery IS
     SIGNAL shift_reg : sr_type;
 
     SIGNAL wr_cnt    : STD_LOGIC_VECTOR(7 DOWNTO 0);
-    SIGNAL wr_addr   : STD_LOGIC_VECTOR(27 DOWNTO 0);
+    SIGNAL wr_addr   : STD_LOGIC_VECTOR(3 DOWNTO 0);
 
     SIGNAL calc_cnt  : STD_LOGIC_VECTOR(11 DOWNTO 0);
 
@@ -78,7 +77,7 @@ BEGIN
                 shift_reg  <=  (others => (others => '0'));
                 calc_cnt <= (others => '0');
                 calc_sum <= (others => '0');
-                wr_cnt   <= (others => '0');
+                wr_cnt   <= "00000001";
                 wr_addr  <= (others => '0');
             END IF;     
         END IF;
