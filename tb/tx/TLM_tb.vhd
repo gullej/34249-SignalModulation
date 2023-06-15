@@ -52,7 +52,6 @@ architecture testbench of TLM_tb is
 
   signal clk_recovery_data_out   :  std_logic_vector(3 DOWNTO 0);
   signal clk_recovery_wr_out     :  std_logic;
-  signal clk_recovery_valid_out  :  std_logic;
 
   signal tranceiver_data   :  std_logic_vector(13 DOWNTO 0);
   signal tranceiver_valid  :  std_logic;
@@ -93,8 +92,17 @@ architecture testbench of TLM_tb is
     ParamFromModel(16 downto 0)
   );
 
+  -- Gray Code Tx signals
+  signal tx_gray_code_vc_valid  :  std_logic;
+  signal tx_gray_code_vc_last   :  std_logic; 
+  signal tx_gray_code_vc_data   :  std_logic_vector(0 DOWNTO 0);
+
+  -- Gray Code Rx signals
+  signal rx_gray_code_vc_write  :  std_logic;
+  signal rx_gray_code_vc_data   :  std_logic_vector(DATA_WIDTH - 1 DOWNTO 0);
+
 -----------------------------------------------------------
---        Test Controller DUTonents Declaration         --
+--        Test Controller DUTonents Declaration          --
 --vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv--
 
   component test_ctrl_e is
@@ -238,7 +246,7 @@ architecture testbench of TLM_tb is
     );
 
 -----------------------------------------------------------
---                     TLM DUT's                         --
+--               TLM Transmitter DUT's                   --
 --vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv--
 
   ----------------------------------------------
@@ -299,6 +307,10 @@ architecture testbench of TLM_tb is
         tx_val      =>  pulse_shaper_valid_out
       );
 
+-----------------------------------------------------------
+--                 TLM Receiver DUT's                    --
+--vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv--
+
   ----------------------------------------------
   --            Match Filter DUT              --
   ----------------------------------------------  
@@ -331,8 +343,7 @@ architecture testbench of TLM_tb is
         rx_val      => match_filter_valid_out,
         --
         tx_dat      => clk_recovery_data_out,
-        tx_wr       => clk_recovery_wr_out,
-        tx_val      => clk_recovery_valid_out 
+        tx_wr       => clk_recovery_wr_out 
       );
 
 -----------------------------------------------------------
