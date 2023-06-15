@@ -6,7 +6,7 @@ library ieee ;
 entity DE1_SOC_TOP_DAC is
     port (
         CLOCK_50    :  IN  STD_LOGIC;
-        PIN_AA14    :  IN  STD_LOGIC; --Reset Button
+        rst_button  :  IN  STD_LOGIC; --Reset Button
         -- 0 TO 13 Data | Data Pins A on GPIO 0 of ADC
         GPIO_0_D15  :  OUT STD_LOGIC; --Data Pin 0
         GPIO_0_D13  :  OUT STD_LOGIC; --Data Pin 1
@@ -80,7 +80,7 @@ architecture RTL of DE1_SOC_TOP_DAC is
     PLL_CLK : entity work.PLL
         port map (
             refclk   => CLOCK_50,
-            rst      => PIN_AA14,
+            rst      => rst_button,
             outclk_0 => clk_160,
             outclk_1 => clk_20,
             locked   => locked
@@ -89,7 +89,7 @@ architecture RTL of DE1_SOC_TOP_DAC is
     PBRS_Map : entity work.PBRS
         port map (
             clk       =>  clk_160,
-            rst       =>  PIN_AA14,
+            rst       =>  rst_button,
             --Output
             tx_data   =>  pbrs_data,
             tx_valid  =>  pbrs_valid
@@ -102,7 +102,7 @@ architecture RTL of DE1_SOC_TOP_DAC is
         port map (
             clk_wr      =>  clk_160,
             clk_rd      =>  clk_20,
-            rst         =>  PIN_AA14,
+            rst         =>  rst_button,
             
             rx_valid    =>  pbrs_valid,
             rx_data     =>  pbrs_data,

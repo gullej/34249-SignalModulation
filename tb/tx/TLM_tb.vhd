@@ -211,26 +211,6 @@ architecture testbench of TLM_tb is
         tx_trans_rec    =>  pulse_tx_rec
       );
 
-    ------------------------------------------
-    -- Tranciever VC                        --
-    ------------------------------------------
-    Pulse_Shaper_VC : entity work.pulseshaper_rx_vc
-    GENERIC MAP(
-      DATA_WIDTH => DATA_WIDTH
-    )
-    port map (
-      clk             =>  clk_b,
-      rst             =>  rst,
-      rx_valid        =>  pulse_shaper_valid_out,
-      rx_data         =>  pulse_shaper_data_out,
-      rx_read         =>  fifo_read,
-      tx_empty        =>  open,
-      tx_data         =>  open,
-      -- Transaction interfaces
-      rx_trans_rec    =>  pulse_rx_rec,
-      tx_trans_rec    =>  pulse_tx_rec
-    );
-
 -----------------------------------------------------------
 --                 TLM Test Controller                   --
 --vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv--
