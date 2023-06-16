@@ -73,6 +73,9 @@ rrr = rr(1:m:end);
 fsig = round(rrr/m*alpha);
 fsig ~= signal
 
+r_ = r(1:m:end)/m*alpha;
+bins = pam_gray_inv(r_, size(r_,2), 4);
+[0 0 signal 0 0 ] ~= round(r_)
 %%
 
 sample = repmat([1 0 0 0 0 0 0 0 ], 1, size(rr,2)/8);

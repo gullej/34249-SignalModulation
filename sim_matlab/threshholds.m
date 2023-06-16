@@ -21,7 +21,7 @@ b = 21;
 
 alpha = 11.0646; % from other scripts
 m = 8;
-thresh = 2/m*alpha;
+thresh = 2/m;
 
 thresh_pos = bin(fi(thresh,1,L,b));
 thresh_neg = bin(fi(-thresh,1,L,b));

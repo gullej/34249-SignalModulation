@@ -25,7 +25,8 @@ entity test_ctrl_e is
     sync_tx_rec    :  inout StreamRecType;
     sync_rx_rec    :  inout StreamRecType;
     pulse_rx_rec   :  inout StreamRecType;
-    pulse_tx_rec   :  inout StreamRecType
+    pulse_tx_rec   :  inout StreamRecType;
+    hard_decision_rx_rec : inout StreamRecType
 
   );
 end test_ctrl_e;

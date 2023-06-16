@@ -60,6 +60,9 @@ architecture testbench of TLM_tb is
   signal downsample_data_out     :  std_logic_vector(27 DOWNTO 0);
   signal downsample_val_out      :  std_logic;
 
+  signal hard_decision_data_out  : std_logic_vector(1 DOWNTO 0);
+  signal hard_decision_val_out   : std_logic;
+
   signal tranceiver_data   :  std_logic_vector(13 DOWNTO 0);
   signal tranceiver_valid  :  std_logic;
 
@@ -99,6 +102,14 @@ architecture testbench of TLM_tb is
     ParamFromModel(15 downto 0)
   );
 
+    -- Hard decision Rx interfaces
+    signal  hard_decision_rx_rec : StreamRecType (
+      DataToModel(27 DOWNTO 0),
+      DataFromModel(1 DOWNTO 0),
+      ParamToModel  (15 downto 0),
+      ParamFromModel(15 downto 0)
+    );
+
   -- Gray Code Tx VC signals
   signal tx_gray_code_vc_valid  :  std_logic;
   signal tx_gray_code_vc_last   :  std_logic; 
@@ -126,6 +137,10 @@ architecture testbench of TLM_tb is
   --Transmsit signals
   signal tx_pulse_shaper_vc_empty  :  std_logic;
   signal tx_pulse_shaper_vc_data   :  std_logic_vector(8 * DATA_WIDTH - 1 DOWNTO 0);
+
+  -- Pulse2Out VC signals
+  signal pulse2out_vc_data         : std_logic_vector(1 downto 0);
+  signal pulse2out_vc_valid        : std_logic;
 -----------------------------------------------------------
 --        Test Controller DUTonents Declaration          --
 --vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv--
@@ -139,7 +154,8 @@ architecture testbench of TLM_tb is
       sync_tx_rec    :  inout StreamRecType;
       sync_rx_rec    :  inout StreamRecType;
       pulse_rx_rec   :  inout StreamRecType;
-      pulse_tx_rec   :  inout StreamRecType
+      pulse_tx_rec   :  inout StreamRecType;
+      hard_decision_rx_rec : inout StreamRecType
     );
   end component; 
 
@@ -293,6 +309,22 @@ architecture testbench of TLM_tb is
         tx_trans_rec  =>  pulse_tx_rec
       );
 
+  ------------------------------------------
+  --           Hard Decision VC           --
+  ------------------------------------------
+  HardDecision_VC : entity work.pulse2out_rx_vc
+  generic map (
+    DATA_WIDTH    => DATA_WIDTH
+  )
+  port map (
+    clk           =>  clk_c,
+    rst           =>  rst,
+    rx_data       =>  pulse2out_vc_data,
+    rx_val        =>  pulse2out_vc_valid,
+    -- Transaction interfaces
+    trans_rec  =>  hard_decision_rx_rec
+  );     
+
 -----------------------------------------------------------
 --                 TLM Test Controller                   --
 --vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv--
@@ -308,7 +340,8 @@ architecture testbench of TLM_tb is
       sync_tx_rec    =>  sync_tx_rec,
       sync_rx_rec    =>  sync_rx_rec,
       pulse_rx_rec   =>  pulse_rx_rec,
-      pulse_tx_rec   =>  pulse_tx_rec
+      pulse_tx_rec   =>  pulse_tx_rec,
+      hard_decision_rx_rec => hard_decision_rx_rec
     );
 
 -----------------------------------------------------------
@@ -434,6 +467,26 @@ architecture testbench of TLM_tb is
       tx_dat      => downsample_data_out,
       tx_val      => downsample_val_out
     );
+
+  ----------------------------------------------
+  --                 HD DUT                   --
+  ----------------------------------------------
+
+  HardDecision_DUT : entity work.hard_decision
+  generic map(
+    DATA_WIDTH  =>  DATA_WIDTH
+  )
+  PORT MAP (
+    rst         =>  rst,
+    clk         => clk_c,
+    --
+    rx_dat      => downsample_data_out,
+    rx_val      => downsample_val_out,
+    --
+    tx_dat      => pulse2out_vc_data,
+    tx_val      => pulse2out_vc_valid
+  );
+
 
 -----------------------------------------------------------
 --                     TLM Top DUT                       --
