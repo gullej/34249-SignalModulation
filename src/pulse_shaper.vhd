@@ -80,7 +80,7 @@ BEGIN
                 + coeff_h1  * (shift_reg_x(15) + shift_reg_x(17)) 
                 + coeff_h0  *  shift_reg_x(16) );
 
-    SR : PROCESS(clk)
+    SR : PROCESS(clk) is
     BEGIN
         IF (RISING_EDGE(clk)) THEN
             tx_read <= '0';
@@ -115,7 +115,8 @@ BEGIN
             END IF;
 
             IF rst = '1' then
-                ctrl  <=  (7 DOWNTO 1 => '0') & '1';
+                tx_read <= '1';
+                ctrl  <=  "00000001";
                 shift_reg_i  <=  (others => (others => '0'));
                 shift_reg_x  <=  (others => (others => '0'));
             end if;     

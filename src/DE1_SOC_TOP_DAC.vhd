@@ -80,7 +80,7 @@ architecture RTL of DE1_SOC_TOP_DAC is
     PLL_CLK : entity work.PLL
         port map (
             refclk   => CLOCK_50,
-            rst      => rst_button,
+            rst      => '0',
             outclk_0 => clk_160,
             outclk_1 => clk_20,
             locked   => locked
@@ -89,7 +89,7 @@ architecture RTL of DE1_SOC_TOP_DAC is
     PBRS_Map : entity work.PBRS
         port map (
             clk       =>  clk_160,
-            rst       =>  rst_button,
+            rst       =>  not rst_button,
             --Output
             tx_data   =>  pbrs_data,
             tx_valid  =>  pbrs_valid
@@ -102,7 +102,7 @@ architecture RTL of DE1_SOC_TOP_DAC is
         port map (
             clk_wr      =>  clk_160,
             clk_rd      =>  clk_20,
-            rst         =>  rst_button,
+            rst         =>  not rst_button,
             
             rx_valid    =>  pbrs_valid,
             rx_data     =>  pbrs_data,
