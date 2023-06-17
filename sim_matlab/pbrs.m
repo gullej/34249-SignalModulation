@@ -1,7 +1,7 @@
 close all; clc; clearvars;
 % pbrs
 
-n = 1200;
+n = 127*8;
 
 sr = [1 1 1 1 1 1 1];
 bit_seq = zeros(1, n);
@@ -30,6 +30,10 @@ plot(v(2033:3048))
 plot(v(3049:4064))
 legend('first', 'second', 'third', 'fourth')
 
-sum(v(1017:2032) ~= v(2033:3048))
-sum(v(2033:3048) ~= v(3049:4064))
+% first and last periods will be altered slightly by the convolution adding
+% and going to zeros, but the second and third period should be identical:
+period = 127 * 8; % we add 7 zeros after each symbol so the period is biggers
+sum(v(period+1:period*2) ~= v(period*2+1:period*3))
+
+
 
