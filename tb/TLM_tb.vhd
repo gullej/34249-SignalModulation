@@ -65,6 +65,14 @@ architecture testbench of TLM_tb is
   signal hard_decision_data_out  : std_logic_vector(1 DOWNTO 0);
   signal hard_decision_val_out   : std_logic;
 
+  signal pbrs_dat_out            : std_logic;
+  signal pbrs_val_out            : std_logic;
+
+  signal tranceiver_dat_out      : std_logic_vector(13 downto 0);
+
+  signal receiver_dat_out        : std_logic_vector(1 downto 0);
+  signal receiver_val_out        : std_logic;
+
   signal tranceiver_data   :  std_logic_vector(13 DOWNTO 0);
   signal tranceiver_valid  :  std_logic;
 
@@ -326,6 +334,56 @@ architecture testbench of TLM_tb is
     -- Transaction interfaces
     trans_rec  =>  hard_decision_rx_rec
   );     
+
+  ------------------------------------------
+  --          Tranceiver Top VC           --
+  ------------------------------------------
+
+  PBRS_VC : entity work.PBRS
+  port map (
+      clk       =>  clk,
+      rst       =>  rst,
+      --Output
+      tx_data   =>  pbrs_dat_out,
+      tx_valid  =>  pbrs_val_out
+  );
+
+  Tranceiver_VC : entity work.tranceiver_top 
+    GENERIC map (
+        DATA_WIDTH => DATA_WIDTH
+    )
+    PORT MAP (
+        clk_wr    =>  clk,
+        clk_rd    =>  clk_b,
+        rst       =>  rst,
+        --CONTROL INPUTS
+        rx_valid  =>  pbrs_val_out,
+        --DATA INPUTS
+        rx_data   =>  pbrs_dat_out,
+        --CONTROL OUTPUTS
+        tx_valid  =>  open,
+        --DATA OUTPUTS
+        tx_data   =>  tranceiver_dat_out
+    );
+
+  ------------------------------------------
+  --           Receiver Top VC            --
+  ------------------------------------------
+
+  Receiver_VC : ENTITY work.receiver_top
+    GENERIC MAP (
+        DATA_WIDTH => DATA_WIDTH
+    )
+    PORT MAP (
+        clk_f     => clk_b,
+        clk_s     => clk_c,
+        rst       => rst,
+        --
+        rx_data   => tranceiver_dat_out,
+        --
+        tx_data   => receiver_dat_out,
+        tx_val    => receiver_val_out
+    );
 
 -----------------------------------------------------------
 --                 TLM Test Controller                   --

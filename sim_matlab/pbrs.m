@@ -17,10 +17,25 @@ m = 8;
 [pulse,E,mF] = cos_pulse(T,m,4,0.2);
 cut = (size(pulse,2)-1)/2;
 
+A = 14;
+L = 2 + 1; % (dependant on constellation size)
+
+alpha  = sum(abs(pulse));     % formula
+lambda = ceil(log2(alpha)); % formula
+
+taps_norm   = pulse / alpha;
+alpha_norm  = sum(abs(taps_norm));
+lambda_norm = ceil(log2(alpha_norm)); % formula
+
+b_norm = min(floor(log2(2^(A-1)-1/max(abs(taps_norm)))), A - L - lambda_norm);
+
+taps_norm_fi     = double(fi(taps_norm,1,A-L-1,b_norm-1));
+
+
 v = pam_gray(bit_seq, n, 4);
 N = n/log2(4);
 v = reshape([v; zeros(m - 1, N)], 1, N * m);
-v = conv(v, pulse);
+v = conv(v, taps_norm_fi);
 v = v(cut+1:end-cut);
 
 hold on
@@ -35,5 +50,4 @@ legend('first', 'second', 'third', 'fourth')
 period = 127 * 8; % we add 7 zeros after each symbol so the period is biggers
 sum(v(period+1:period*2) ~= v(period*2+1:period*3))
 
-
-
+%
