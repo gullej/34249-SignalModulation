@@ -9,6 +9,9 @@ library osvvm ;
 library osvvm_common ;
   context osvvm_common.OsvvmCommonContext ;
 
+library tranceiver_lib;
+  context tranceiver_lib.transceiver_context;
+
 entity TLM_tb is
 end entity TLM_tb ;
 
@@ -234,7 +237,7 @@ architecture testbench of TLM_tb is
   ------------------------------------------
   --      Graycode Transmitter VC         --
   ------------------------------------------
-    TX_GrayCode_VC : entity work.graycode_tx_vc
+    TX_GrayCode_VC : graycode_tx_vc
       generic map (
         DATA_WIDTH  =>  DATA_WIDTH
       )
@@ -251,7 +254,7 @@ architecture testbench of TLM_tb is
   ------------------------------------------
   --        Graycode Receiver VC          --
   ------------------------------------------
-    RX_GrayCode_VC : entity work.graycode_rx_vc
+    RX_GrayCode_VC : graycode_rx_vc
       generic map (
         DATA_WIDTH  =>  DATA_WIDTH
       )
@@ -267,7 +270,7 @@ architecture testbench of TLM_tb is
   ------------------------------------------
   --             Clk_sync VC              --
   ------------------------------------------
-    Clk_Sync_VC : entity work.clk_sync_rx_vc
+    Clk_Sync_VC : clk_sync_rx_vc
     GENERIC MAP(
             DATA_WIDTH => DATA_WIDTH
         )
@@ -292,7 +295,7 @@ architecture testbench of TLM_tb is
   ------------------------------------------
   --           Pulse Shaper VC            --
   ------------------------------------------
-    Pulse_Shaper_VC : entity work.pulseshaper_rx_vc
+    Pulse_Shaper_VC : pulseshaper_rx_vc
       generic map (
         DATA_WIDTH    => DATA_WIDTH
       )
