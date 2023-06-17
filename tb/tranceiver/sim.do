@@ -13,11 +13,20 @@ project addfile ../src/tranceiver/clk_sync.vhd
 project addfile ../src/tranceiver/pulse_shaper.vhd
 project addfile ../src/tranceiver/tranceiver_top.vhd
 
+project addfile ../src/receiver/clk_recovery.vhd
+project addfile ../src/receiver/downsample.vhd
+project addfile ../src/receiver/match_filter.vhd
+project addfile ../src/receiver/hard_decision.vhd
+project addfile ../src/receiver/dual_port_ram.vhd
+project addfile ../src/receiver/receiver_top.vhd
+
 project addfile ../tb/test_ctrl_e.vhd
 project addfile ../tb/tranceiver/verification_components/clk_sync/clk_sync_rx_vc.vhd
 project addfile ../tb/tranceiver/verification_components/graycode/graycode_rx_vc.vhd
 project addfile ../tb/tranceiver/verification_components/graycode/graycode_tx_vc.vhd
 project addfile ../tb/tranceiver/verification_components/pulseshaper/pulseshaper_rx_vc.vhd
+
+project addfile ../tb/receiver/verification_components/pulse2out/pulse2out_rx_vc.vhd
 
 project addfile ../tb/TLM_tb.vhd
 project addfile ../tb/tranceiver/tests/clk_sync/clk_sync_test1.vhd
