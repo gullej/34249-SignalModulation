@@ -94,9 +94,9 @@ architecture graycode_test1 of test_ctrl_e is
     end graycode_test1;
     
     Configuration TLM_tb_graycode_test1 of TLM_tb is
-        for testbench
+        for pam_map_testbench
           for TestCtrl_1 : test_ctrl_e
-            use entity work.test_ctrl_e(graycode_test1); 
+            use entity work.test_ctrl_e(graycode_test1);
           end for; 
         end for; 
       end TLM_tb_graycode_test1; 

@@ -22,7 +22,6 @@ architecture testbench of TLM_tb is
 --vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv--
 
   constant DATA_WIDTH : integer := 3; -- Data width at transceiver input interface
-  constant CONSTALATION_SIZE : integer := 2; -- 1: PAM2 | 2: PAM4 | 3: PAM8
 
   constant tperiod_Clk   : time := 10 ns ;
   constant tperiod_Clk_b : time := 20 ns ;

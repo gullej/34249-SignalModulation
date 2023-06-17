@@ -20,12 +20,12 @@ entity test_ctrl_e is
 
     --Transaction interface
     
-    stream_tx_rec  :  inout StreamRecType;
-    stream_rx_rec  :  inout StreamRecType;
-    sync_tx_rec    :  inout StreamRecType;
-    sync_rx_rec    :  inout StreamRecType;
-    pulse_rx_rec   :  inout StreamRecType;
-    pulse_tx_rec   :  inout StreamRecType;
+    stream_tx_rec        :  inout StreamRecType;
+    stream_rx_rec        :  inout StreamRecType;
+    sync_tx_rec          :  inout StreamRecType;
+    sync_rx_rec          :  inout StreamRecType;
+    pulse_rx_rec         :  inout StreamRecType;
+    pulse_tx_rec         :  inout StreamRecType;
     hard_decision_rx_rec : inout StreamRecType
 
   );
