@@ -33,3 +33,5 @@ project addfile ../tb/tranceiver/tests/clk_sync/clk_sync_test1.vhd
 project addfile ../tb/tranceiver/tests/graycode/graycode_test1.vhd
 project addfile ../tb/tranceiver/tests/pulseshaper/pulseshaper_directed_test1.vhd
 project addfile ../tb/tranceiver/tests/pulseshaper/pulseshaper_test1.vhd
+project addfile ../tb/tranceiver/TLM/tranceiver_tlm.vhd
+project addfile ../tb/tranceiver/TLM/pam_map_tlm.vhd

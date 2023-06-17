@@ -63,7 +63,7 @@ package tranceiver_component_pkg is
 
 
     ------------------------------------------------------------
-    component pulse_shaper IS
+    component pulse_shaper is
     ------------------------------------------------------------
         generic (
             DATA_WIDTH : INTEGER := 3
@@ -80,6 +80,29 @@ package tranceiver_component_pkg is
             tx_val      : OUT STD_LOGIC
         );
     end component pulse_shaper;
+
+
+
+    ------------------------------------------------------------
+    component tranceiver_top is
+    ------------------------------------------------------------
+    generic (
+        DATA_WIDTH : INTEGER := 3
+    );
+    port (
+        clk_wr    :  IN  STD_LOGIC;
+        clk_rd    :  IN  STD_LOGIC;
+        rst       :  IN  STD_LOGIC;
+        --CONTROL INPUTS
+        rx_valid  :  IN  STD_LOGIC;
+        --DATA INPUTS
+        rx_data   :  IN  STD_LOGIC;
+        --CONTROL OUTPUTS
+        tx_valid  :  OUT STD_LOGIC;
+        --DATA OUTPUTS
+        tx_data   :  OUT STD_LOGIC_VECTOR(13 DOWNTO 0)
+    );
+    end component tranceiver_top;
 
 
 
