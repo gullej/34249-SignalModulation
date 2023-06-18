@@ -43,6 +43,8 @@ architecture RTL of DE1_SOC_TOP_DAC is
     signal clk_160  :  std_logic;
     signal clk_20  :  std_logic;
     signal locked  :  std_logic;
+    signal clk_200  :  std_logic;
+    signal locked2  :  std_logic;
 
     signal SMA_DAC4      :  std_logic;
     signal OSC_SMA_ADC4  :  std_logic;
@@ -52,6 +54,25 @@ architecture RTL of DE1_SOC_TOP_DAC is
 
     signal tx_tranceiver_data   :  std_logic_vector(13 DOWNTO 0);
     signal tx_tranceiver_valid  :  std_logic;
+
+    component PLL_0002 is
+        port (
+            refclk   : in  std_logic := 'X'; -- clk
+            rst      : in  std_logic := 'X'; -- reset
+            outclk_0 : out std_logic;        -- clk
+            outclk_1 : out std_logic;        -- clk
+            locked   : out std_logic         -- export
+        );
+    end component PLL_0002;
+
+    component PLL2_0002 is
+		port (
+			refclk   : in  std_logic := 'X'; -- clk
+			rst      : in  std_logic := 'X'; -- reset
+			outclk_0 : out std_logic;        -- clk
+			locked   : out std_logic         -- export
+		);
+	end component PLL2_0002;
 
     begin
     
@@ -76,14 +97,22 @@ architecture RTL of DE1_SOC_TOP_DAC is
 
     --Write Pin
     GPIO_0_D17  <=  tx_tranceiver_valid;
-
-    PLL_CLK : entity work.PLL
+    
+    pll_inst : component PLL_0002
         port map (
-            refclk   => CLOCK_50,
-            rst      => '0',
-            outclk_0 => clk_160,
-            outclk_1 => clk_20,
-            locked   => locked
+            refclk   => CLOCK_50,   --  refclk.clk
+            rst      => '0',      --   reset.reset
+            outclk_0 => clk_160, -- outclk0.clk
+            outclk_1 => clk_20, -- outclk1.clk
+            locked   => locked    --  locked.export
+        );
+
+    pll2_inst : component PLL2_0002
+        port map (
+            refclk    =>  CLOCK_50,
+            rst       =>  '0',
+            outclk_0  =>  clk_200,
+            locked    =>  locked2
         );
 
     PBRS_Map : entity work.PBRS
