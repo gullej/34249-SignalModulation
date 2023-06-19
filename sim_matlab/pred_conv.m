@@ -34,36 +34,36 @@ vvvv = bin(vvv')  - '0';
 
 %%
 
-% args = dec2bin(signal, 8) - '0';
-% args = args(:,end-2:end);
-% 
-% fileID = fopen('in.txt','w');
-% fprintf(fileID,'%d%d%d000000000000000000000\n',args');
-% 
-% fclose(fileID);
-% 
-% fileID = fopen('out.txt', 'w');
-% fprintf(fileID,'%d%d%d%d%d%d%d%d%d%d%d%d%d%d\n',vvvv');
-% 
-% fclose(fileID);
-% 
-% h = figure;
-% 
-% plot(vvv)
-% 
-% grid on
-% ylim([-.5 0.5])
-% xlim([0 432])
-% 
-% legend('PAM4', 'Location','southwest')
-% ylabel('Amplitude')
-% xlabel('Sample Number','FontSize',11,'FontWeight','bold')
-% title('Filtered Signal','FontSize',14,'FontWeight','bold')
-% 
-% set(h,'Units','Inches');
-% pos = get(h,'Position');
-% set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-% print(h,'../Docs/PulseShaperDirectedTest_1_target','-dpdf','-r0')
+args = dec2bin(signal, 8) - '0';
+args = args(:,end-2:end);
+
+fileID = fopen('in.txt','w');
+fprintf(fileID,'%d%d%d000000000000000000000\n',args');
+
+fclose(fileID);
+
+fileID = fopen('out.txt', 'w');
+fprintf(fileID,'%d%d%d%d%d%d%d%d%d%d%d%d%d%d\n',vvvv');
+
+fclose(fileID);
+
+h = figure;
+
+plot(vvv)
+
+grid on
+ylim([-.5 0.5])
+xlim([0 432])
+
+legend('PAM4', 'Location','southwest')
+ylabel('Amplitude')
+xlabel('Sample Number','FontSize',11,'FontWeight','bold')
+title('Filtered Signal','FontSize',14,'FontWeight','bold')
+
+set(h,'Units','Inches');
+pos = get(h,'Position');
+set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(h,'../Docs/PulseShaperDirectedTest_1_target','-dpdf','-r0')
 
 %%
 
