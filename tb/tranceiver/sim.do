@@ -30,9 +30,9 @@ project addfile ../tb/top_vc.vhd
 project addfile ../tb/receiver/verification_components/pulse2out/pulse2out_rx_vc.vhd
 
 project addfile ../tb/TLM_tb.vhd
+project addfile ../tb/tranceiver/TLM/pam_map_tlm.vhd
 project addfile ../tb/tranceiver/tests/clk_sync/clk_sync_test1.vhd
 project addfile ../tb/tranceiver/tests/graycode/graycode_test1.vhd
 project addfile ../tb/tranceiver/tests/pulseshaper/pulseshaper_directed_test1.vhd
 project addfile ../tb/tranceiver/tests/pulseshaper/pulseshaper_test1.vhd
 project addfile ../tb/tranceiver/TLM/tranceiver_tlm.vhd
-project addfile ../tb/tranceiver/TLM/pam_map_tlm.vhd
