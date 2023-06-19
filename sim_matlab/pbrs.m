@@ -47,14 +47,16 @@ h = figure;
 plot(v(1:2*period))
 grid on
 xlim([1 2*period])
-pbaspect([5 1 1])
+
+set(h,'Units','Inches');
+
+set(h,'position',[0, 0, 12, 2.5]); 
+pos = get(h,'Position')
 
 legend('PAM4', 'Location','southeast')
 ylabel('Amplitude')
 xlabel('Sample Number','FontSize',11,'FontWeight','bold')
 title('Filtered Signal','FontSize',14,'FontWeight','bold')
 
-set(h,'Units','Inches');
-pos = get(h,'Position');
 set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
 print(h,'../Docs/PulseShaperPBRSTest_1_target','-dpdf','-r0')
