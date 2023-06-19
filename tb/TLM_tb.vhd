@@ -24,8 +24,8 @@ architecture testbench of TLM_tb is
   constant DATA_WIDTH : integer := 3; -- Data width at transceiver input interface
 
   constant tperiod_Clk   : time := 10 ns ;
-  constant tperiod_Clk_b : time := 20 ns ;
-  constant tperiod_Clk_c : time := 160 ns ;
+  constant tperiod_Clk_b : time := 2.5 ns ;
+  constant tperiod_Clk_c : time := 20 ns ;
   constant tpd           : time := 2 ns ;
 
 -----------------------------------------------------------
