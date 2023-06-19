@@ -24,3 +24,29 @@ taps_fi_bin = bin(taps_fi);
 
 taps_norm_fi     = fi(taps_norm,1,A-L-1,b_norm-1)';
 taps_norm_fi_bin = bin(taps_norm_fi);
+
+%%
+
+h = figure;
+plot(taps)
+ylabel('Amplitude')
+xlabel('Sample Number','FontSize',11,'FontWeight','bold')
+title('Impulse Response','FontSize',14,'FontWeight','bold')
+set(h,'Units','Inches');
+pos = get(h,'Position');
+
+set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(h,'../Docs/Impulse_Response','-dpdf','-r0')
+
+%%
+
+h = figure;
+plot(taps_norm_fi)
+ylabel('Amplitude')
+xlabel('Sample Number','FontSize',11,'FontWeight','bold')
+title('Impulse Response (Finite Point)','FontSize',14,'FontWeight','bold')
+set(h,'Units','Inches');
+pos = get(h,'Position');
+
+set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(h,'../Docs/Impulse_Response_NoFi','-dpdf','-r0')
