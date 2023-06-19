@@ -50,6 +50,14 @@ architecture tranceiver_testbench of TLM_tb is
       ParamFromModel(15 downto 0)
     );
 
+    -- Top VC interfaces
+  signal rx_top_in_rec, rx_top_out_rec : StreamRecType (
+    DataToModel(0 DOWNTO 0),
+    DataFromModel(0 DOWNTO 0),
+    ParamToModel  (15 downto 0),
+    ParamFromModel(15 downto 0)
+  );
+
     component test_ctrl_e is
     port (
       rst            :  in  std_logic;
@@ -60,7 +68,9 @@ architecture tranceiver_testbench of TLM_tb is
       sync_rx_rec    :  inout StreamRecType;
       pulse_rx_rec   :  inout StreamRecType;
       pulse_tx_rec   :  inout StreamRecType;
-      hard_decision_rx_rec : inout StreamRecType
+      hard_decision_rx_rec : inout StreamRecType;
+      rx_trans_rec_in      :  inout StreamRecType;
+      rx_trans_rec_out     :  inout StreamRecType
     );
   end component;
 
@@ -101,7 +111,9 @@ begin
       sync_rx_rec          =>  sync_rx_rec,
       pulse_rx_rec         =>  pulse_rx_rec,
       pulse_tx_rec         =>  pulse_tx_rec,
-      hard_decision_rx_rec =>  hard_decision_rx_rec
+      hard_decision_rx_rec =>  hard_decision_rx_rec,
+      rx_trans_rec_in      =>  rx_top_in_rec,
+      rx_trans_rec_out     =>  rx_top_out_rec
     );
 
     PBRS_DUT : PBRS
