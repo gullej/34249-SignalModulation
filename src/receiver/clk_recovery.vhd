@@ -58,11 +58,11 @@ BEGIN
             shift_reg(1 to 2) <= shift_reg(0 to 1);
             shift_reg(0) <= signed(rx_dat);
 
-            calc_cnt <= calc_cnt + 1;
             wr_cnt <= wr_cnt(6 downto 0) & wr_cnt(7);
 
             IF(wr_cnt(7) = '1') THEN
                 wr_addr <= wr_addr + 8;
+                calc_cnt <= calc_cnt + 1;
                 calc_sum  <= calc_sum + calc_diff;
             END IF;            
 
