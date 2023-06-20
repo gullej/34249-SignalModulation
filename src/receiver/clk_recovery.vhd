@@ -68,8 +68,10 @@ BEGIN
 
             IF (to_integer(unsigned(calc_cnt)) = 2048) THEN
                 IF (calc_avg > delta_pos) THEN
+                    wr_cnt <= wr_cnt(5 downto 0) & wr_cnt(7 downto 6);
                     wr_addr <= wr_addr + 9;
                 ELSIF (calc_avg < delta_neg) THEN
+                    wr_cnt <= wr_cnt(7 downto 0);
                     wr_addr <= wr_addr + 7;
                 END IF;
                 calc_cnt <= (others => '0');
