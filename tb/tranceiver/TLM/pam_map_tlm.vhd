@@ -42,12 +42,19 @@ architecture pam_map_testbench of TLM_tb is
   );
 
     -- Hard decision Rx interfaces
-    signal  hard_decision_rx_rec : StreamRecType (
-      DataToModel(27 DOWNTO 0),
-      DataFromModel(1 DOWNTO 0),
-      ParamToModel  (15 downto 0),
-      ParamFromModel(15 downto 0)
-    );
+  signal  hard_decision_rx_rec : StreamRecType (
+    DataToModel(27 DOWNTO 0),
+    DataFromModel(1 DOWNTO 0),
+    ParamToModel  (15 downto 0),
+    ParamFromModel(15 downto 0)
+  );
+
+  signal rx_top_in_rec, rx_top_out_rec : StreamRecType (
+    DataToModel(0 DOWNTO 0),
+    DataFromModel(0 DOWNTO 0),
+    ParamToModel  (15 downto 0),
+    ParamFromModel(15 downto 0)
+  );
 
   -- Gray Code Tx VC signals
   signal tx_gray_code_vc_valid  :  std_logic;
@@ -60,15 +67,17 @@ architecture pam_map_testbench of TLM_tb is
 
     component test_ctrl_e is
     port (
-      rst            :  in  std_logic;
+      rst                  :  in  std_logic;
       --Transaction interface
-      stream_tx_rec  :  inout StreamRecType;
-      stream_rx_rec  :  inout StreamRecType;
-      sync_tx_rec    :  inout StreamRecType;
-      sync_rx_rec    :  inout StreamRecType;
-      pulse_rx_rec   :  inout StreamRecType;
-      pulse_tx_rec   :  inout StreamRecType;
-      hard_decision_rx_rec : inout StreamRecType
+      stream_tx_rec        :  inout StreamRecType;
+      stream_rx_rec        :  inout StreamRecType;
+      sync_tx_rec          :  inout StreamRecType;
+      sync_rx_rec          :  inout StreamRecType;
+      pulse_rx_rec         :  inout StreamRecType;
+      pulse_tx_rec         :  inout StreamRecType;
+      hard_decision_rx_rec :  inout StreamRecType;
+      rx_trans_rec_in      :  inout StreamRecType;
+      rx_trans_rec_out     :  inout StreamRecType
     );
   end component; 
   
@@ -153,7 +162,9 @@ begin
       sync_rx_rec          =>  sync_rx_rec,
       pulse_rx_rec         =>  pulse_rx_rec,
       pulse_tx_rec         =>  pulse_tx_rec,
-      hard_decision_rx_rec =>  hard_decision_rx_rec
+      hard_decision_rx_rec =>  hard_decision_rx_rec,
+      rx_trans_rec_in      =>  rx_top_in_rec,
+      rx_trans_rec_out     =>  rx_top_out_rec
     );
 
 end architecture pam_map_testbench;
